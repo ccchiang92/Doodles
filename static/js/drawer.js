@@ -8,13 +8,16 @@ var newTopBTN = d3.select('#new');
 var resetBTN = d3.select('#reset');
 
 function makeResponsive(){
-    var initCan = d3.select('#c');
+    var initCan = d3.select('#canvasDiv');
     if (!initCan.empty()) {
         initCan.remove();
     }
     var Height = window.innerHeight*0.6;
     var Width = window.innerWidth*0.6;
-    var drawCanvas = d3.select('.canvasDiv')
+    var drawCanvasDiv = d3.select('.canvasDiv')
+        .append('div')
+        .attr('id','canvasDiv')
+    drawCanvasDiv
         .append('canvas')
         .attr('height', Height)
         .attr('width', Width)
