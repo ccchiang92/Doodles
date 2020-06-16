@@ -30,19 +30,16 @@ function makeResponsive(){
     canvas.freeDrawingBrush.color = 'black';
 
 
-    // Grab new topic that is not the current one
+// Grab new topic that is not the current one
 newTopBTN.on('click',function(){
     var tempCategories = categories.filter(category => category !== currentTopic);
-    console.log(tempCategories);
-    console.log(categories);
-    tempIndex = Math.floor(Math.random() * tempCategories.length)
+    var tempIndex = Math.floor(Math.random() * tempCategories.length)
     currentTopic=tempCategories[tempIndex];
     topic.text('Draw '+currentTopic);
 });
 
 // Reset canvas
 resetBTN.on('click',function(){
-    console.log('Reset Canvas')
     canvas.clear();
 });
 }
