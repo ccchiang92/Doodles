@@ -1,20 +1,33 @@
 // Drawing canvas js by Chris Chiang
 // Init
+// Setup categories
 var categories = ['Animals','Fruit','Toys','Furniture'];
 var topic = d3.select('.topic');
 var currentTopic = categories[Math.floor(Math.random() * categories.length)];
 topic.text('Draw '+currentTopic);
+// Select buttons
 var newTopBTN = d3.select('#new');
 var resetBTN = d3.select('#reset');
 var assessBTN = d3.select('#assess');
 var saveBTN = d3.select('#save');
 var startBTN = d3.select('#start');
 var freeBTN = d3.select('#free');
+var testBTN = d3.select('#test');
+// Init variables
 var isDrawing = false;
 var drawingCorners;
 var drawingCoords =[];
 var countingDown = false;
+var model;
 
+// load tf model
+// Setting in async function as loadLayerModel is a async method
+async function loadModel() {
+    model = await tf.loadLayersModel('./model/model.json');
+}
+loadModel();
+
+// Draw canvas and setup event listeners
 function makeResponsive(){
     let initCan = d3.select('#canvasDiv');
     if (!initCan.empty()) {
@@ -35,6 +48,8 @@ function makeResponsive(){
         isDrawingMode: false
       });
     // set up a array to store stroke coordinates
+    // Set background to white
+    canvas.backgroundColor = '#ffffff';
     canvas.freeDrawingBrush.width = 7;
     canvas.freeDrawingBrush.color = 'black';
     canvas.freeDrawingCursor= 'url(./static/images/pencil.png) 0 40, crosshair';
@@ -65,20 +80,23 @@ newTopBTN.on('click',function(){
     topic.text('Draw '+currentTopic);
     canvas.clear();
     drawingCoords =[];
+    canvas.backgroundColor = '#ffffff';
 });
 
 // Reset canvas
 resetBTN.on('click',function(){
     canvas.clear();
     drawingCoords =[];
+    canvas.backgroundColor = '#ffffff';
 });
 
-// Start drawing canvas
+// Start drawing canvas and start up timer
 startBTN.on('click',function(){
     if (!countingDown){
         countingDown= true;
         canvas.clear();
-        drawingCoords =[];  
+        drawingCoords =[];
+        canvas.backgroundColor = '#ffffff';
         canvas.isDrawingMode= true;
         var rTime = 30;
         var timerText =d3.select('.timer');
@@ -96,12 +114,17 @@ startBTN.on('click',function(){
             }
         }, 1000);}
 });
+// Some extra buttons
 freeBTN.on('click',function(){
     canvas.isDrawingMode =true;
 });
+testBTN.on('click',function(){
+    model.predict(tf.ones([1, 28, 28, 1])).print();
+});
+
 saveBTN.on('click',function(){
     if (!fabric.Canvas.supports('toDataURL')) {
-        alert('Can not save image on this browers');
+        alert('Can not save image on this brower, try firefox');
       }
       else {
         window.open(canvas.toDataURL('png'));
@@ -124,20 +147,63 @@ assessBTN.on('click',function(){
         var pRatio = window.devicePixelRatio;
         var pixels = canvas.getContext('2D').getImageData(drawingCorners.min[0] * pRatio, drawingCorners.min[1] * pRatio,
             Math.ceil((drawingCorners.max[0] - drawingCorners.min[0]) * pRatio), Math.ceil((drawingCorners.max[1] - drawingCorners.min[1]) * pRatio));
-        canvas.getContext('2D').putImageData(pixels, 0,0)
+        // var pixels = canvas.contextContainer.getImageData(drawingCorners.min[0] * pRatio, drawingCorners.min[1] * pRatio,
+                // Math.ceil((drawingCorners.max[0] - drawingCorners.min[0]) * pRatio), Math.ceil((drawingCorners.max[1] - drawingCorners.min[1]) * pRatio));
+        // canvas.getContext('2D').putImageData(pixels, 0,0)
         // console.log(pixels);
+        evalImg(pixels)
     }else{
-        console.log('drawing missing')
+        alert('No drawing');
     }
 });
 
 
 }
 function evalImg(img){
+    // improve memory performance in tidy
+    
+        // convert imgData to tf object with 1 color
+        var imgTF = tf.browser.fromPixels(img,1);
+        // resize img to 28x28 matching our data
+        var img28 = tf.image.resizeBilinear(imgTF,[28,28]);
+        // scale value down to between 0 and 1 and covert to grey scale by subtraction
+        var scaled = tf.scalar(1.0).sub(img28.div(tf.scalar(255.0)));
 
+        // call model for prediction
+        var prediction = model.predict(scaled.expandDims(0)).dataSync();
+        // scaled.expandDims(0).print();
+        // find highest predictions
+        var topIndices = [];
+        for (var i = 0; i < prediction.length; i++){
+            topIndices.push(i);
+            if (topIndices.length>5){
+                // Sort the arry of indices base on prediction value and pop the lowest
+                topIndices.sort(function(a,b){
+                    return prediction[b]-prediction[a];
+                });
+                topIndices.pop();
+            }
+        }
+       
+        console.log(`Top indices: ${topIndices}`);
+        console.log('Probabilities')
+        topIndices.forEach(function(index){
+            console.log(prediction[index]);
+        })
+        scaled.print();
+        drawProcessed(tf.image.resizeBilinear(img28,[100,100]).toInt());
+        // var convertedImg = tf.browser.toPixels(imgTF);
+        // var convertedImg = tf.browser.toPixels(img28,document.getElementById(outCanvas));
+      
+
+
+    
 };
 
-
+async function drawProcessed(tensor){
+    var convertedImg = await tf.browser.toPixels(tensor,document.getElementById('outCanvas'));
+    return convertedImg;
+}
 
 
 
