@@ -1,0 +1,10 @@
+.firstRow {
+  font-size: 20px;
+  background-image: url('../images/doodles.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
+  background-color: rgba(255,255,255,0.85);
+  background-blend-mode: lighten;
+}
+

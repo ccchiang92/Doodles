@@ -7,13 +7,16 @@ topic.text('Draw '+currentTopic);
 var newTopBTN = d3.select('#new');
 var resetBTN = d3.select('#reset');
 var assessBTN = d3.select('#assess');
+var saveBTN = d3.select('#save');
+var startBTN = d3.select('#start');
+var freeBTN = d3.select('#free');
 var isDrawing = false;
-var canDraw =true;
 var drawingCorners;
 var drawingCoords =[];
+var countingDown = false;
 
 function makeResponsive(){
-    var initCan = d3.select('#canvasDiv');
+    let initCan = d3.select('#canvasDiv');
     if (!initCan.empty()) {
         initCan.remove();
     }
@@ -29,7 +32,7 @@ function makeResponsive(){
         .attr('id','c')
         .attr('style',"border:1px solid grey;margin:5px;");
     var canvas =  new fabric.Canvas('c', {
-        isDrawingMode: canDraw
+        isDrawingMode: false
       });
     // set up a array to store stroke coordinates
     canvas.freeDrawingBrush.width = 7;
@@ -38,20 +41,17 @@ function makeResponsive(){
     // setup canvas event listeners
     canvas.on('mouse:down',function(){
         isDrawing=true;
-        // console.log('start');
     });
     canvas.on('mouse:up',function(){
         isDrawing=false;
-        // console.log('end');
     });
     
     // store stroke coordinates when drawing and within bounds
     canvas.on('mouse:move',function(event) {
-        if (isDrawing & canDraw){
+        if (isDrawing & canvas.isDrawingMode){
             var coord = canvas.getPointer(event);
             if (coord.x>=0 & coord.x <=Width & coord.y>=0 & coord.y <=Height){
                 drawingCoords.push(coord);
-                // console.log(drawingCoords);
             } 
         }
     });
@@ -63,8 +63,6 @@ newTopBTN.on('click',function(){
     var tempIndex = Math.floor(Math.random() * tempCategories.length)
     currentTopic=tempCategories[tempIndex];
     topic.text('Draw '+currentTopic);
-    canDraw=true;
-    canvas.isDrawingMode = canDraw;
     canvas.clear();
     drawingCoords =[];
 });
@@ -75,18 +73,59 @@ resetBTN.on('click',function(){
     drawingCoords =[];
 });
 
+// Start drawing canvas
+startBTN.on('click',function(){
+    if (!countingDown){
+        countingDown= true;
+        canvas.clear();
+        drawingCoords =[];  
+        canvas.isDrawingMode= true;
+        var rTime = 30;
+        var timerText =d3.select('.timer');
+        timerText.text(`You have ${rTime} secs`).transition().duration(500).style("color","green");
+        startBTN.append('img').attr('src', './static/images/hourglass.gif').attr('width',40).attr('height',40).attr('id','hourglass');
+        var countDown = setInterval(function(){
+            rTime = rTime -1
+            timerText.text(`You have ${rTime} secs`);
+            if (rTime==0){
+                canvas.isDrawingMode = false;
+                countingDown= false;
+                d3.select('#hourglass').remove();
+                timerText.text('').transition().duration(1000);
+                clearInterval(countDown);
+            }
+        }, 1000);}
+});
+freeBTN.on('click',function(){
+    canvas.isDrawingMode =true;
+});
+saveBTN.on('click',function(){
+    if (!fabric.Canvas.supports('toDataURL')) {
+        alert('Can not save image on this browers');
+      }
+      else {
+        window.open(canvas.toDataURL('png'));
+      }
+});
+
+
 
 // Evaluate current image
 assessBTN.on('click',function(){
-    canDraw=false;
-    canvas.isDrawingMode = canDraw;
+    canvas.isDrawingMode = false;
     // process image
     // grab corner coordinates
     if (drawingCoords.length >= 2){
         xCoords = drawingCoords.map(coord=>coord.x);
         yCoords = drawingCoords.map(coord=>coord.y);
-        drawingCorners={min:[Math.min(...xCoords),Math.min(...yCoords)],max:[Math.min(...xCoords),Math.min(...yCoords)]};
+        drawingCorners={min:[Math.min(...xCoords),Math.min(...yCoords)],max:[Math.max(...xCoords),Math.max(...yCoords)]};
         console.log(drawingCorners);
+        // Use the corners to grab pixel data array of the drawing
+        var pRatio = window.devicePixelRatio;
+        var pixels = canvas.getContext('2D').getImageData(drawingCorners.min[0] * pRatio, drawingCorners.min[1] * pRatio,
+            Math.ceil((drawingCorners.max[0] - drawingCorners.min[0]) * pRatio), Math.ceil((drawingCorners.max[1] - drawingCorners.min[1]) * pRatio));
+        canvas.getContext('2D').putImageData(pixels, 0,0)
+        // console.log(pixels);
     }else{
         console.log('drawing missing')
     }
@@ -94,9 +133,9 @@ assessBTN.on('click',function(){
 
 
 }
+function evalImg(img){
 
-// steps edge box, scale down to 28x28
-//  Ramer–Douglas–Peucker algorithm 
+};
 
 
 
