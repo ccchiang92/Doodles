@@ -7,6 +7,8 @@
   <title>Doodle Game</title>
   <link rel="stylesheet" href="./static/css/d3Style.css">
   <link rel="stylesheet" type="text/css" href="./static/css/style.css">
+  <link href="./static/js/Clusterize.js-master/clusterize.css" rel="stylesheet">
+  <script src="./static/js/Clusterize.js-master/clusterize.min.js"></script>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
@@ -40,7 +42,7 @@
         <div class="row firstRow">
           <div class="col-md-12">
               <div class='container align-middle'>
-                <a class='topic'>Draw Something</a>
+ 
                 <br>
                 <button id='new' type="button" class="btn btn-primary">New Category</button>
                 <button id='start' type="button" class="btn btn-success">Start Drawing</button>
@@ -48,8 +50,32 @@
                 <button id='test' type="button" class="btn btn-sm btn-outline-warning">Test Model</button>
                 <h5 class='timer'> </h5>
                 <br>
-                <div class='canvasDiv'></div> 
-                
+              </div>
+          </div>
+        </div>
+
+        
+        <div class="row firstRow container-fluid">
+            <div class="col-md-2">
+              <a class='topic'>Draw Something</a>
+              <div id="scrollArea" class="clusterize-scroll">
+                <ul id="contentArea" class="clusterize-content">
+                </ul>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class='canvasDiv'></div> 
+            </div>
+
+            <div class="col-md-4">
+
+            </div>
+        </div>
+        
+        <div class="row firstRow">
+          <div class="col-md-12">
+              <div class='container align-middle'>
                 <br>
                 <button id='reset' type="button" class="btn btn-sm btn-outline-danger">Reset Canvas</button>
                 <button id='save' type="button" class="btn btn-sm btn-outline-dark">Download Drawing</button>
@@ -58,10 +84,7 @@
                 <button id='assess' type="button" class="btn btn-secondary">Assess</button>
                 <br>
                 <canvas id='outCanvas' width="100" height='100' ></canvas>
-
               </div>
-            </div>
-
           </div>
         </div>
         
@@ -88,6 +111,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.1/dist/tf.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
     <script src="static/js/drawer.js"></script>
+    <!-- <script src="static/js/list.js"></script> -->
       
 
 

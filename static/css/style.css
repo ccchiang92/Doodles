@@ -8,3 +8,6 @@
   background-blend-mode: lighten;
 }
 
+.col-md-2 {
+  margin-left: 100px;
+}
