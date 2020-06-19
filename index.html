@@ -12,7 +12,7 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #f3e51c;">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #f3e51c;">
         <a class="navbar-brand" href="/">Doodle Game</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -44,7 +44,7 @@
               <div class='container align-middle'>
  
                 <br>
-                <button id='new' type="button" class="btn btn-primary">New Category</button>
+                
                 <button id='start' type="button" class="btn btn-success">Start Drawing</button>
                 <button id='free' type="button" class="btn btn-sm btn-primary">Free Draw</button>
                 <button id='test' type="button" class="btn btn-sm btn-outline-warning">Test Model</button>
@@ -57,6 +57,8 @@
         
         <div class="row firstRow">
             <div class="col-md-2">
+              <button id='new' type="button" class="btn btn-primary">New Category</button>
+              <br>
               <a class='topic'>Draw Something</a>
               <div id="scrollArea" class="clusterize-scroll">
                 <ul id="contentArea" class="clusterize-content"></ul>
@@ -71,22 +73,23 @@
               <button id='assess' type="button" class="btn btn-secondary">Assess</button>
               <br> <br>
               <div id="graph"></div>
+              <br> <br>
+              <canvas id='outCanvas' width="100" height='100' ></canvas>
             </div>
         </div>
         
         <div class="row firstRow">
           <div class="col-md-12">
               <div class='container align-middle'>
-                <br>
+                
                 <button id='reset' type="button" class="btn btn-sm btn-outline-danger">Reset Canvas</button>
                 <button id='save' type="button" class="btn btn-sm btn-outline-dark">Download Drawing</button>
-                <br>  
-                <canvas id='outCanvas' width="100" height='100' ></canvas>
               </div>
+              <br>
           </div>
         </div>
         
-        <footer class="py-4 bg-dark mt-auto">
+        <footer class="py-3 bg-dark mt-auto">
           <div class="container-fluid">
               <div class="d-flex align-items-center justify-content-between small">
                   <div class="text-muted">UCB DA Bootcamp 2020. Project Team: Chris, Brian, Axel.</div>

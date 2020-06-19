@@ -55,7 +55,7 @@ function makeResponsive(){
     if (!initCan.empty()) {
         initCan.remove();
     }
-    var Height = window.innerHeight*0.6;
+    var Height = window.innerHeight*0.55;
     var Width = window.innerWidth*0.45;
     var drawCanvasDiv = d3.select('.canvasDiv')
         .append('div')
