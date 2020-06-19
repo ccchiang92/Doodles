@@ -2,7 +2,7 @@
 <html lang="en-us">
 <head>
   <meta charset="UTF-8">  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Doodle Game</title>
   <link rel="stylesheet" href="./static/css/d3Style.css">
@@ -40,14 +40,14 @@
       
      
         <div class="row firstRow">
-          <div class="col-md-12">
+          <div class="col-xs-2 col-md-12">
               <div class='container align-middle'>
  
                 <br>
                 
-                <button id='start' type="button" class="btn btn-success">Start Drawing</button>
-                <button id='free' type="button" class="btn btn-sm btn-primary">Free Draw</button>
-                <button id='test' type="button" class="btn btn-sm btn-outline-warning">Test Model</button>
+                <button id='start' type="button" class="btn btn-success btn-responsive">Start Drawing</button>
+                <button id='free' type="button" class="btn btn-sm btn-primary btn-responsive">Free Draw</button>
+                <button id='test' type="button" class="btn btn-sm btn-outline-warning btn-responsive">Test Model</button>
                 <h5 class='timer'> </h5>
                 <br>
               </div>
@@ -56,8 +56,8 @@
 
         
         <div class="row firstRow">
-            <div class="col-md-2">
-              <button id='new' type="button" class="btn btn-primary">New Category</button>
+            <div class="col-xs-2 col-md-2">
+              <button id='new' type="button" class="btn btn-primary btn-responsive">New Category</button>
               <br>
               <a class='topic'>Draw Something</a>
               <div id="scrollArea" class="clusterize-scroll">
@@ -65,12 +65,12 @@
               </div>
             </div>
             
-            <div class="col-md-6">
+            <div class="col-xs-2 col-md-6">
               <div class='canvasDiv'></div> 
             </div>
 
-            <div class="col-md-3">
-              <button id='assess' type="button" class="btn btn-secondary">Assess</button>
+            <div class="col-xs-2 col-md-3">
+              <button id='assess' type="button" class="btn btn-secondary btn-responsive">Assess</button>
               <br> <br>
               <div id="graph"></div>
               <br> <br>
@@ -79,7 +79,7 @@
         </div>
         
         <div class="row firstRow">
-          <div class="col-md-12">
+          <div class="col-xs-2 col-md-12">
               <div class='container align-middle'>
                 
                 <button id='reset' type="button" class="btn btn-sm btn-outline-danger">Reset Canvas</button>

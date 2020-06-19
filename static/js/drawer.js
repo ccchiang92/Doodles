@@ -65,7 +65,7 @@ function makeResponsive(){
         .attr('height', Height)
         .attr('width', Width)
         .attr('id','c')
-        .attr('style',"border:1px solid grey;margin:5px;");
+        .attr('style',"border:5px solid grey;margin:1px;");
     var canvas =  new fabric.Canvas('c', {
         isDrawingMode: false
       });

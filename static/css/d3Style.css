@@ -52,14 +52,23 @@
   border-radius: 4px;
 }
 
+.clusterize-content {
+  font-size: 20px;
+}
+
 /* Mobile Rules */
 @media screen and (max-width: 530px) {
   .stateText {
     display: none;
   }
-
   .aText {
     font-size: 14px;
+  }
+  .clusterize-content {
+    font-size: 10px;
+  }
+  .btn  {
+    font-size: 10px;
   }
 }
 
