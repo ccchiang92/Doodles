@@ -12,7 +12,7 @@ var drawings = {
 };
 var topic = d3.select('.topic');
 var currentTopic = categories[Math.floor(Math.random() * categories.length)];
-topic.text('Draw '+currentTopic);
+topic.text('Category: '+currentTopic);
 // Select buttons
 var newTopBTN = d3.select('#new');
 var resetBTN = d3.select('#reset');
@@ -99,7 +99,7 @@ newTopBTN.on('click',function(){
     var tempCategories = categories.filter(category => category !== currentTopic);
     var tempIndex = Math.floor(Math.random() * tempCategories.length)
     currentTopic=tempCategories[tempIndex];
-    topic.text('Draw '+currentTopic);
+    topic.text('Category: '+currentTopic);
     canvas.clear();
     drawingCoords =[];
     canvas.backgroundColor = '#ffffff';
@@ -242,3 +242,34 @@ async function drawProcessed(tensor){
 
 makeResponsive();
 d3.select(window).on('resize', makeResponsive);
+
+
+var data = [35,25,15,10,5];
+    var width = 400,
+        scaleFactor = 7,
+        barHeight = 40;
+
+    var graph = d3.select("#graph")
+                  .append("svg")
+                  .attr("width", width)
+                  .attr("height", barHeight * data.length);
+
+    var bar = graph.selectAll("g")
+                  .data(data)
+                  .enter()
+                  .append("g")
+                  .attr("transform", function(d, i) {
+                        return "translate(0," + i * barHeight + ")";
+                  });
+
+    bar.append("rect")
+       .attr("width", function(d) {
+                return d * scaleFactor;
+       })
+       .attr("height", barHeight - 1);
+
+    bar.append("text")
+       .attr("x", function(d) { return (d*scaleFactor); })
+       .attr("y", barHeight / 2)
+       .attr("dy", ".35em")
+       .text(function(d) { return d; });

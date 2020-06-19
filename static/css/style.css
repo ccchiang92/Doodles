@@ -3,14 +3,28 @@
   background-image: url('../images/doodles.jpg');
   background-repeat: no-repeat;
   background-attachment: fixed;
-  background-size: 100% 100%;
+  /* background-size: 100% 100%; */
   background-color: rgba(255,255,255,0.85);
   background-blend-mode: lighten;
 }
 
 .col-md-2 {
-  margin-left: 100px;
+  margin-left: 60px;
 }
 .col-md-12 {
-  margin-left: 170px;
+  margin-left: 130px;
+}
+
+.col-md-3 {
+  margin-right: 60px;
+}
+
+svg rect {
+    fill: rgb(233, 233, 32);
+}
+
+svg text {
+     fill:white;
+    font: 20px sans-serif;
+    text-anchor: end;
 }
