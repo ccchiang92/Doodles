@@ -11,11 +11,11 @@ var categories = ['Animals','Fruits','Vehicles'];
 // 'pickup truck','police car','sailboat','school bus','skateboard','speedboat','submarine','tractor','train','truck','van']
 // };
 
-var easy25 = ['ant','bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','apple','banana','grapes','pear','pineapple','airplane','bicycle','bus','car','submarine','truck'];
+var easy25 = ['snake','bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','shark','apple','banana','grapes','pear','pineapple','strawberry','airplane','bicycle','bus','car','submarine','truck','van','sailboat','train'];
 var drawings ={
-    Animals: easy25.slice(0,15),
-    Fruits: easy25.slice(15,20),
-    Vehicles: easy25.slice(20,25),
+    Animals: easy25.slice(0,16),
+    Fruits: easy25.slice(16,22),
+    Vehicles: easy25.slice(22,30),
 };
 var categ25=[];
 var topic = d3.select('.topic');
@@ -84,7 +84,7 @@ function makeResponsive(){
     canvas.on('mouse:up',function(){
         isDrawing=false;
         if (canvas.isDrawingMode){
-            cropAndEval(canvas);
+            // cropAndEval(canvas);
         }
     });
     
@@ -208,14 +208,40 @@ function evalImg(img){
 
         // scale value down to between 0 and 1 and covert to grey scale by subtraction
         var scaled = tf.scalar(1.0).sub(img28.div(tf.scalar(255.0)));
-
         // call model for prediction
         var prediction = model.predict(scaled.expandDims(0)).dataSync();
+        // var firstStep = model.predict(scaled.expandDims(0),model.layers[0].outputs).dataSync();
+        // var firstStep = model.layers[0].apply(scaled.expandDims(0)).dataSync();
+        // console.log(firstStep);
+        // console.log(firstStep.length);
+        // console.log(tf.tensor(firstStep.slice(0,784)))  ;
+        // var firImg =tf.tensor(firstStep.slice(784,1568)).reshape([28,28]);
+        // console.log(firImg);
+        // firImg.print();
+        // function reshape(arr, rows, cols) {
+        //     var copy = arr.slice(0); // Copy all elements.
+        //     arr.length = 0; // Clear out existing array.
+          
+        //     for (var r = 0; r < rows; r++) {
+        //       var row = [];
+        //       for (var c = 0; c < cols; c++) {
+        //         var i = r * cols + c;
+        //         if (i < copy.length) {
+        //           row.push(copy[i]);
+        //         }
+        //       }
+        //       arr.push(row);
+        //     }
+        //   };
+        // console.log(reshape(firImg,28,28));
+
 
 
         // find highest predictions
         var probabilities = grabMaxOutput(prediction);
         drawProcessed(img28.toInt());
+        // drawProcessed(tf.scalar(1.0).sub(firImg));
+        // drawProcessed(firstStep.slice(0,784).toInt());
       
 };
 
@@ -233,12 +259,14 @@ d3.select(window).on('resize', makeResponsive);
 // function to load tf model
 // Setting in async function as loadLayerModel is a async method
 async function loadModel() {
-    model = await tf.loadLayersModel('./model/easy25/model.json');
+    model = await tf.loadLayersModel('./model/easy30/model.json');
+    // console.log(model.layers[0]);
+    // console.log(model.layers[0].getWeights());
     
 }
 // function to load categories names and setup loaded icon after finishing
 async function loadCategories(){
-    var cat25 = await jQuery.getJSON('./model/easy25/easyCategories.json')
+    var cat25 = await jQuery.getJSON('./model/easy30/easyCategories.json')
     categ25 = cat25
     d3.select('#loadingText').text('Model Loaded');
     d3.select('#loadingText').append('img').attr('width',40).attr('height',40).attr('src','./static/images/check.png');
