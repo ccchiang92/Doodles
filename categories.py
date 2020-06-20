@@ -10,3 +10,6 @@ print(fruits)
 print(len(fruits))
 print(vehicle)
 print(len(vehicle))
+easy25 = ['ant','bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','apple','banana','grapes','pear','pineapple','airplane','bicycle','bus','car','submarine','truck']
+print(easy)
+print(len(easy))

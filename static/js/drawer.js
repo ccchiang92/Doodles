@@ -1,15 +1,23 @@
 // Drawing canvas js by Chris Chiang
 // Init
 // Setup categories
-var categories = ['Animal','Fruit','Vehicle'];
-var drawings = {
-    Animal: ['ant','bat','bear','bee','bird','butterfly','camel','cat','cow','crab','crocodile','dog','dolphin','dragon','duck',
-'elephant','fish','flamingo','frog','giraffe','hedgehog','horse','kangaroo','lion','lobster','monkey','mosquito','mouse','octopus','owl',
-'panda','parrot','penguin','pig','rabbit','raccoon','rhinoceros','scorpion','sea turtle','shark','sheep','snail','snake','spider','squirrel','swan','tiger','whale','zebra'],
-    Fruit: ['apple','banana','blackberry','blueberry','grapes','pear','pineapple','strawberry','watermelon'],
-    Vehicle: ['aircraft carrier','airplane','ambulance','bicycle','bulldozer','bus','canoe','car','cruise ship','firetruck','flying saucer','helicopter',
-'pickup truck','police car','sailboat','school bus','skateboard','speedboat','submarine','tractor','train','truck','van']
+var categories = ['Animals','Fruits','Vehicles'];
+// var drawings = {
+//     Animal: ['ant','bat','bear','bee','bird','butterfly','camel','cat','cow','crab','crocodile','dog','dolphin','dragon','duck',
+// 'elephant','fish','flamingo','frog','giraffe','hedgehog','horse','kangaroo','lion','lobster','monkey','mosquito','mouse','octopus','owl',
+// 'panda','parrot','penguin','pig','rabbit','raccoon','rhinoceros','scorpion','sea turtle','shark','sheep','snail','snake','spider','squirrel','swan','tiger','whale','zebra'],
+//     Fruit: ['apple','banana','blackberry','blueberry','grapes','pear','pineapple','strawberry','watermelon'],
+//     Vehicle: ['aircraft carrier','airplane','ambulance','bicycle','bulldozer','bus','canoe','car','cruise ship','firetruck','flying saucer','helicopter',
+// 'pickup truck','police car','sailboat','school bus','skateboard','speedboat','submarine','tractor','train','truck','van']
+// };
+
+var easy25 = ['ant','bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','apple','banana','grapes','pear','pineapple','airplane','bicycle','bus','car','submarine','truck'];
+var drawings ={
+    Animals: easy25.slice(0,15),
+    Fruits: easy25.slice(15,20),
+    Vehicles: easy25.slice(20,25),
 };
+var categ25=[];
 var topic = d3.select('.topic');
 var currentTopic = categories[Math.floor(Math.random() * categories.length)];
 topic.text('Category: '+currentTopic);
@@ -42,12 +50,6 @@ var clusterize = new Clusterize({
     contentId: 'contentArea',
   });
 
-// load tf model
-// Setting in async function as loadLayerModel is a async method
-async function loadModel() {
-    model = await tf.loadLayersModel('./model/model.json');
-}
-loadModel();
 
 // Draw canvas and setup event listeners
 function makeResponsive(){
@@ -81,6 +83,9 @@ function makeResponsive(){
     });
     canvas.on('mouse:up',function(){
         isDrawing=false;
+        if (canvas.isDrawingMode){
+            cropAndEval(canvas);
+        }
     });
     
     // store stroke coordinates when drawing and within bounds
@@ -92,7 +97,7 @@ function makeResponsive(){
             } 
         }
     });
-
+    
 
 // Grab new topic that is not the current one
 newTopBTN.on('click',function(){
@@ -151,8 +156,11 @@ startBTN.on('click',function(){
 freeBTN.on('click',function(){
     canvas.isDrawingMode =true;
 });
+// test model on a blank image
 testBTN.on('click',function(){
-    model.predict(tf.ones([1, 28, 28, 1])).print();
+    var testPredict = model.predict(tf.zeros([1, 28, 28, 1])).dataSync();
+    var outProbs= grabMaxOutput(testPredict);
+    // drawBar(outProbs);
 });
 
 saveBTN.on('click',function(){
@@ -165,10 +173,13 @@ saveBTN.on('click',function(){
 });
 
 
-
 // Evaluate current image
 assessBTN.on('click',function(){
     canvas.isDrawingMode = false;
+    cropAndEval(canvas);
+});
+
+function cropAndEval(canvas){
     // process image
     // grab corner coordinates
     if (drawingCoords.length >= 2){
@@ -178,61 +189,37 @@ assessBTN.on('click',function(){
         console.log(drawingCorners);
         // Use the corners to grab pixel data array of the drawing
         var pRatio = window.devicePixelRatio;
-        var pixels = canvas.getContext('2D').getImageData(drawingCorners.min[0] * pRatio, drawingCorners.min[1] * pRatio,
-            Math.ceil((drawingCorners.max[0] - drawingCorners.min[0]) * pRatio), Math.ceil((drawingCorners.max[1] - drawingCorners.min[1]) * pRatio));
-        // var pixels = canvas.contextContainer.getImageData(drawingCorners.min[0] * pRatio, drawingCorners.min[1] * pRatio,
-                // Math.ceil((drawingCorners.max[0] - drawingCorners.min[0]) * pRatio), Math.ceil((drawingCorners.max[1] - drawingCorners.min[1]) * pRatio));
-        // canvas.getContext('2D').putImageData(pixels, 0,0)
-        // console.log(pixels);
-        evalImg(pixels)
+        var pixels = canvas.getContext('2D').getImageData(Math.floor(drawingCorners.min[0]) * pRatio, Math.floor(drawingCorners.min[1]) * pRatio,
+            Math.ceil((drawingCorners.max[0] - Math.floor(drawingCorners.min[0])) * pRatio), Math.ceil((drawingCorners.max[1] - Math.floor(drawingCorners.min[1])) * pRatio));
+        // evaluate drawing
+        evalImg(pixels);
     }else{
         alert('No drawing');
     }
-});
-
+}
 
 }
 function evalImg(img){
-    // improve memory performance in tidy
-    
         // convert imgData to tf object with 1 color
         var imgTF = tf.browser.fromPixels(img,1);
         // resize img to 28x28 matching our data
-        var img28 = tf.image.resizeBilinear(imgTF,[28,28]);
+        // var img28 = tf.image.resizeBilinear(imgTF,[28,28]);
+        var img28 = tf.image.resizeNearestNeighbor(imgTF,[28,28]);
+
         // scale value down to between 0 and 1 and covert to grey scale by subtraction
         var scaled = tf.scalar(1.0).sub(img28.div(tf.scalar(255.0)));
 
         // call model for prediction
         var prediction = model.predict(scaled.expandDims(0)).dataSync();
-        // scaled.expandDims(0).print();
+
+
         // find highest predictions
-        var topIndices = [];
-        for (var i = 0; i < prediction.length; i++){
-            topIndices.push(i);
-            if (topIndices.length>5){
-                // Sort the arry of indices base on prediction value and pop the lowest
-                topIndices.sort(function(a,b){
-                    return prediction[b]-prediction[a];
-                });
-                topIndices.pop();
-            }
-        }
-       
-        console.log(`Top indices: ${topIndices}`);
-        console.log('Probabilities')
-        topIndices.forEach(function(index){
-            console.log(prediction[index]);
-        })
-        scaled.print();
-        drawProcessed(tf.image.resizeBilinear(img28,[100,100]).toInt());
-        // var convertedImg = tf.browser.toPixels(imgTF);
-        // var convertedImg = tf.browser.toPixels(img28,document.getElementById(outCanvas));
+        var probabilities = grabMaxOutput(prediction);
+        drawProcessed(img28.toInt());
       
-
-
-    
 };
 
+// draw resized image to output canvas
 async function drawProcessed(tensor){
     var convertedImg = await tf.browser.toPixels(tensor,document.getElementById('outCanvas'));
     return convertedImg;
@@ -243,8 +230,51 @@ async function drawProcessed(tensor){
 makeResponsive();
 d3.select(window).on('resize', makeResponsive);
 
+// function to load tf model
+// Setting in async function as loadLayerModel is a async method
+async function loadModel() {
+    model = await tf.loadLayersModel('./model/easy25/model.json');
+    
+}
+// function to load categories names and setup loaded icon after finishing
+async function loadCategories(){
+    var cat25 = await jQuery.getJSON('./model/easy25/easyCategories.json')
+    categ25 = cat25
+    d3.select('#loadingText').text('Model Loaded');
+    d3.select('#loadingText').append('img').attr('width',40).attr('height',40).attr('src','./static/images/check.png');
+    // return cat25
+}
+// calls to functions to load the tensor CNN model
+loadModel();
+loadCategories();
 
-var data = [35,25,15,10,5];
+// grab top 5 index and probabilities from prediction output
+// return 5 length array, each element is [probability,category_name] 
+function grabMaxOutput(prediction){
+    var topIndices = [];
+    var maxOut=[];
+        for (var i = 0; i < prediction.length; i++){
+            topIndices.push(i);
+            if (topIndices.length>5){
+                // Sort the arry of indices base on prediction value and pop the lowest
+                topIndices.sort(function(a,b){
+                    return prediction[b]-prediction[a];
+                });
+                topIndices.pop();
+            }
+        }
+    console.log('Probabilities')
+    topIndices.forEach(function(index){
+        maxOut.push([prediction[index],categ25[index]]);
+        console.log(prediction[index]);
+        console.log(categ25[index]);
+    })
+    return maxOut;
+}
+
+
+
+function drawBar(data){
     var width = 400,
         scaleFactor = 7,
         barHeight = 40;
@@ -273,3 +303,7 @@ var data = [35,25,15,10,5];
        .attr("y", barHeight / 2)
        .attr("dy", ".35em")
        .text(function(d) { return d; });
+    }
+
+// Draw dummy bar
+drawBar([35,25,15,10,5]);
