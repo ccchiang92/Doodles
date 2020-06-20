@@ -192,65 +192,75 @@ function cropAndEval(canvas){
         var pixels = canvas.getContext('2D').getImageData(Math.floor(drawingCorners.min[0]) * pRatio, Math.floor(drawingCorners.min[1]) * pRatio,
             Math.ceil((drawingCorners.max[0] - Math.floor(drawingCorners.min[0])) * pRatio), Math.ceil((drawingCorners.max[1] - Math.floor(drawingCorners.min[1])) * pRatio));
         // evaluate drawing
-        evalImg(pixels);
+        evalImg(pixels,canvas);
     }else{
         alert('No drawing');
     }
 }
 
 }
-function evalImg(img){
+async function evalImg(img,canvas){
+        console.log(img);
         // convert imgData to tf object with 1 color
-        var imgTF = tf.browser.fromPixels(img,1);
+        var imgTF = tf.browser.fromPixels(img,1);   
         // resize img to 28x28 matching our data
         // var img28 = tf.image.resizeBilinear(imgTF,[28,28]);
         var img28 = tf.image.resizeNearestNeighbor(imgTF,[28,28]);
-
+        var img300 =tf.image.resizeNearestNeighbor(imgTF,[280,280]);
         // scale value down to between 0 and 1 and covert to grey scale by subtraction
         var scaled = tf.scalar(1.0).sub(img28.div(tf.scalar(255.0)));
         // call model for prediction
         var prediction = model.predict(scaled.expandDims(0)).dataSync();
         // var firstStep = model.predict(scaled.expandDims(0),model.layers[0].outputs).dataSync();
+        // var firstStep = model.predict(tf.ones(1,28,28,1),model.layers[0].outputs).dataSync();
         // var firstStep = model.layers[0].apply(scaled.expandDims(0)).dataSync();
-        // console.log(firstStep);
-        // console.log(firstStep.length);
-        // console.log(tf.tensor(firstStep.slice(0,784)))  ;
-        // var firImg =tf.tensor(firstStep.slice(784,1568)).reshape([28,28]);
-        // console.log(firImg);
-        // firImg.print();
-        // function reshape(arr, rows, cols) {
-        //     var copy = arr.slice(0); // Copy all elements.
-        //     arr.length = 0; // Clear out existing array.
-          
-        //     for (var r = 0; r < rows; r++) {
-        //       var row = [];
-        //       for (var c = 0; c < cols; c++) {
-        //         var i = r * cols + c;
-        //         if (i < copy.length) {
-        //           row.push(copy[i]);
-        //         }
-        //       }
-        //       arr.push(row);
-        //     }
-        //   };
-        // console.log(reshape(firImg,28,28));
+        var firstStep = await model.layers[0].apply(tf.scalar(1.0).sub(img300.div(tf.scalar(255.0))).expandDims(0)).dataSync();
+        // var secStep = await model.layers[1].apply(tf.tensor(firstStep).reshape([280,280,16]).expandDims(0)).dataSync();
+        // console.log(secStep);
+        // var firstStep = model.layers[0].apply(tf.ones([1,28,28,1])).dataSync();
+        filterStep=0;
+        rowStep=0;
+        colStep=0;
+        firstStepOut=[];
+        x=[];
+        y=[];
+        for (var i=0;i<firstStep.length;i++){
+            // console.log(i);
+            if (filterStep==8){
+                if (y.length<279){
+                    y.push(Math.abs(firstStep[i]));
+                    // console.log(y.length);
+                }else{
+                    y.push(Math.abs(firstStep[i]));
+                    x.push(y);
+                    // console.log(y);
+                    y=[];
+                }
+                filterStep++;
+            }else if (filterStep===15){
+                filterStep=0;
+            }else{
+                filterStep++;
+            }
 
-
+        }            
+        // console.log(x);
 
         // find highest predictions
         var probabilities = grabMaxOutput(prediction);
-        drawProcessed(img28.toInt());
-        // drawProcessed(tf.scalar(1.0).sub(firImg));
-        // drawProcessed(firstStep.slice(0,784).toInt());
+        barUpdate(probabilities);
+        // plot some inbetween steps
+        drawProcessed(tf.scalar(1).sub(tf.tensor(x)),img28.toInt());
+ 
       
 };
 
 // draw resized image to output canvas
-async function drawProcessed(tensor){
+async function drawProcessed(tensor,tensor2){
     var convertedImg = await tf.browser.toPixels(tensor,document.getElementById('outCanvas'));
+    var convertedImg = await tf.browser.toPixels(tensor2,document.getElementById('outCanvas2'));
     return convertedImg;
 }
-
 
 
 makeResponsive();
@@ -259,14 +269,14 @@ d3.select(window).on('resize', makeResponsive);
 // function to load tf model
 // Setting in async function as loadLayerModel is a async method
 async function loadModel() {
-    model = await tf.loadLayersModel('./model/easy30/model.json');
+    model = await tf.loadLayersModel('./model/30Ver2/model.json');
     // console.log(model.layers[0]);
     // console.log(model.layers[0].getWeights());
     
 }
 // function to load categories names and setup loaded icon after finishing
 async function loadCategories(){
-    var cat25 = await jQuery.getJSON('./model/easy30/easyCategories.json')
+    var cat25 = await jQuery.getJSON('./model/30Ver2/easyCategories.json')
     categ25 = cat25
     d3.select('#loadingText').text('Model Loaded');
     d3.select('#loadingText').append('img').attr('width',40).attr('height',40).attr('src','./static/images/check.png');
@@ -301,30 +311,38 @@ function grabMaxOutput(prediction){
 }
 
 
-
+var barColors=['red','blue','orange','yellow','green'];
 function drawBar(data){
+    var probabilities = data.map(d=>(d[0]*100));
+    var categoryNames = data.map(d=>d[1]);
     var width = 400,
         scaleFactor = 7,
         barHeight = 40;
-
-    var graph = d3.select("#graph")
+    var barDiv =d3.select("#graph");
+    // placeholder
+    var text = barDiv.append('p').text(categoryNames);
+    // 
+    var graph = barDiv
                   .append("svg")
                   .attr("width", width)
                   .attr("height", barHeight * data.length);
 
     var bar = graph.selectAll("g")
-                  .data(data)
+                  .data(probabilities)
                   .enter()
                   .append("g")
                   .attr("transform", function(d, i) {
                         return "translate(0," + i * barHeight + ")";
                   });
-
+    
     bar.append("rect")
        .attr("width", function(d) {
                 return d * scaleFactor;
        })
-       .attr("height", barHeight - 1);
+       .attr("height", barHeight - 1)
+       .attr("fill",function(d){
+            return barColors[Math.floor(d/10)];
+       });
 
     bar.append("text")
        .attr("x", function(d) { return (d*scaleFactor); })
@@ -333,5 +351,24 @@ function drawBar(data){
        .text(function(d) { return d; });
     }
 
+// Incomplete
+function barUpdate(data){
+    var width = 400,
+        scaleFactor = 7,
+        barHeight = 40;
+    var probabilities = data.map(d=>(d[0]*100));
+    var categoryNames = data.map(d=>d[1]);
+    var barDiv =d3.select("#graph");
+    var rectGroup = barDiv.selectAll("rect")
+    barDiv.select('p').text(categoryNames);
+    rectGroup.data(probabilities);
+    rectGroup.transition()
+        .duration(1000)
+        .attr("width", function(d) {
+            return d * scaleFactor;
+   }).attr("fill",function(d){
+    return barColors[Math.floor(d/10)];
+    });
+}
 // Draw dummy bar
-drawBar([35,25,15,10,5]);
+drawBar([[.35,'a'],[.25,'b'],[.15,'c'],[.10,'d'],[.05,'e']]);

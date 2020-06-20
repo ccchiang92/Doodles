@@ -19,9 +19,9 @@
   margin-right: 60px;
 }
 
-svg rect {
+/* svg rect {
     fill: rgb(233, 233, 32);
-}
+} */
 
 svg text {
      fill:white;
