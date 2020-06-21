@@ -62,7 +62,7 @@ function makeResponsive(){
             drawingCoords =[];
             alert('Window resized, drawings wiped and canvas reset');}
     }
-    var Height = window.innerHeight*0.55;
+    var Height = window.innerHeight*0.65;
     var Width = window.innerWidth*0.45;
     var drawCanvasDiv = d3.select('.canvasDiv')
         .append('div')
