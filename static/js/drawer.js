@@ -11,7 +11,7 @@ var categories = ['Animals','Fruits','Vehicles'];
 // 'pickup truck','police car','sailboat','school bus','skateboard','speedboat','submarine','tractor','train','truck','van']
 // };
 
-var easy30 = ['snake','bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','shark','apple','banana','grapes','pear','pineapple','strawberry','airplane','bicycle','bus','car','submarine','truck','van','sailboat','train'];
+var easy30 = ['bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','shark','snake','apple','banana','grapes','pear','pineapple','strawberry','airplane','bicycle','bus','car','submarine','truck','sailboat','train','van'];
 var drawings ={
     Animals: easy30.slice(0,16),
     Fruits: easy30.slice(16,22),
@@ -62,7 +62,7 @@ function makeResponsive(){
             drawingCoords =[];
             alert('Window resized, drawings wiped and canvas reset');}
     }
-    var Height = window.innerHeight*0.55;
+    var Height = window.innerHeight*0.65;
     var Width = window.innerWidth*0.45;
     var drawCanvasDiv = d3.select('.canvasDiv')
         .append('div')
