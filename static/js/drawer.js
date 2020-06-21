@@ -111,6 +111,7 @@ newTopBTN.on('click',function(){
     canvas.clear();
     drawingCoords =[];
     canvas.backgroundColor = '#ffffff';
+    assessed=false;
 
     d3.select(".clusterize-content").selectAll("li").remove()
     d3.select(".clusterize-content")
@@ -128,6 +129,7 @@ resetBTN.on('click',function(){
     canvas.clear();
     drawingCoords =[];
     canvas.backgroundColor = '#ffffff';
+    assessed=false;
 });
 
 // Start drawing canvas and start up timer
@@ -136,6 +138,7 @@ startBTN.on('click',function(){
         var msg = new SpeechSynthesisUtterance('you have 30 seconds to draw')
         window.speechSynthesis.speak(msg);
         countingDown= true;
+        assessed=false;
         canvas.clear();
         drawingCoords =[];
         canvas.backgroundColor = '#ffffff';
@@ -167,6 +170,7 @@ testBTN.on('click',function(){
     var outProbs= grabMaxOutput(testPredict);
     barUpdate(outProbs);
     canvas.clear();
+    assessed=false;
     drawingCoords =[];
     canvas.backgroundColor = '#ffffff';
     alert('Test Success')
