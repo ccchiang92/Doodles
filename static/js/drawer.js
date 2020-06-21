@@ -58,7 +58,9 @@ function makeResponsive(){
     let initCan = d3.select('#canvasDiv');
     if (!initCan.empty()) {
         initCan.remove();
-        alert('Window resized, drawings wiped and canvas reset');
+        if (drawingCoords.length>2){
+            drawingCoords =[];
+            alert('Window resized, drawings wiped and canvas reset');}
     }
     var Height = window.innerHeight*0.55;
     var Width = window.innerWidth*0.45;
