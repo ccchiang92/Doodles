@@ -11,11 +11,11 @@ var categories = ['Animals','Fruits','Vehicles'];
 // 'pickup truck','police car','sailboat','school bus','skateboard','speedboat','submarine','tractor','train','truck','van']
 // };
 
-var easy25 = ['snake','bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','shark','apple','banana','grapes','pear','pineapple','strawberry','airplane','bicycle','bus','car','submarine','truck','van','sailboat','train'];
+var easy30 = ['snake','bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','shark','apple','banana','grapes','pear','pineapple','strawberry','airplane','bicycle','bus','car','submarine','truck','van','sailboat','train'];
 var drawings ={
-    Animals: easy25.slice(0,16),
-    Fruits: easy25.slice(16,22),
-    Vehicles: easy25.slice(22,30),
+    Animals: easy30.slice(0,16),
+    Fruits: easy30.slice(16,22),
+    Vehicles: easy30.slice(22,30),
 };
 var categ25=[];
 var topic = d3.select('.topic');
@@ -28,12 +28,14 @@ var assessBTN = d3.select('#assess');
 var saveBTN = d3.select('#save');
 var startBTN = d3.select('#start');
 var freeBTN = d3.select('#free');
+var detailBTN = d3.select('#detail')
 var testBTN = d3.select('#test');
 // Init variables
 var isDrawing = false;
 var drawingCorners;
 var drawingCoords =[];
 var countingDown = false;
+var assessed =false;
 var model;
 // add list of drawings
 d3.select(".clusterize-content")
@@ -84,7 +86,7 @@ function makeResponsive(){
     canvas.on('mouse:up',function(){
         isDrawing=false;
         if (canvas.isDrawingMode){
-            // cropAndEval(canvas);
+            cropAndEval(canvas,0);
         }
     });
     
@@ -110,7 +112,6 @@ newTopBTN.on('click',function(){
     canvas.backgroundColor = '#ffffff';
 
     d3.select(".clusterize-content").selectAll("li").remove()
-
     d3.select(".clusterize-content")
     .selectAll("ul")
     .data(drawings[currentTopic])
@@ -131,6 +132,8 @@ resetBTN.on('click',function(){
 // Start drawing canvas and start up timer
 startBTN.on('click',function(){
     if (!countingDown){
+        var msg = new SpeechSynthesisUtterance('you have 30 seconds to draw')
+        window.speechSynthesis.speak(msg);
         countingDown= true;
         canvas.clear();
         drawingCoords =[];
@@ -148,6 +151,7 @@ startBTN.on('click',function(){
                 countingDown= false;
                 d3.select('#hourglass').remove();
                 timerText.text('').transition().duration(1000);
+                cropAndEval(canvas,1);
                 clearInterval(countDown);
             }
         }, 1000);}
@@ -160,7 +164,11 @@ freeBTN.on('click',function(){
 testBTN.on('click',function(){
     var testPredict = model.predict(tf.zeros([1, 28, 28, 1])).dataSync();
     var outProbs= grabMaxOutput(testPredict);
-    // drawBar(outProbs);
+    barUpdate(outProbs);
+    canvas.clear();
+    drawingCoords =[];
+    canvas.backgroundColor = '#ffffff';
+    alert('Test Success')
 });
 
 saveBTN.on('click',function(){
@@ -176,10 +184,55 @@ saveBTN.on('click',function(){
 // Evaluate current image
 assessBTN.on('click',function(){
     canvas.isDrawingMode = false;
-    cropAndEval(canvas);
+    cropAndEval(canvas,1);
+    assessed =true;
 });
 
-function cropAndEval(canvas){
+detailBTN.on('click',function(){
+    if (assessed =true){
+        var overDiv = d3.select('body').append('div')
+        .attr('id','overlay');
+        overDiv.append('button')
+            .attr('class',"btn btn-danger btn-lg float-left")
+            .attr('id','close')
+            .text('Close Overlay')
+            .style('position', 'absolute')
+            .style('top','40px')
+            .style('left','40px')
+        overDiv.select('#close').on('click',function(){
+            overDiv.remove();
+        })
+        overDiv.append('button')
+            .attr('class',"btn btn-light btn-lg float-right")
+            .attr('id','pooling')
+            .text('See Next Model Step')
+            .style('position', 'absolute')
+            .style('top','40px')
+            .style('right','40px')
+        overDiv.select('#pooling').on('click',function(){
+            overDiv.remove();
+        })
+        conDiv = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center');
+        conDiv.append('div').attr('class','ovRow1 row justify-content-center').append('h2')
+                .text("Below are the outputs of our first CNN model, a 2D convolution layer.")
+                .attr('class','text-white align-middle')
+                .append('h2').text('The input image is convoluted with 16 different 3x3 matrices to generate 16 different images.').attr('class','text-white align-middle');
+        var row1 = conDiv.append('div').attr('class','row justify-content-center');
+        var row2 = conDiv.append('div').attr('class','row justify-content-center');
+        for (var i=0; i<16;i++){
+            if (i<8){
+                row1.append('canvas').attr('id','overCanvas'+i).style('padding','10px');
+            }else{
+                row2.append('canvas').attr('id','overCanvas'+i).style('padding','10px');
+            }
+        }
+        cropAndEval(canvas,2);
+    }else{
+        alert('Assess an image first!')
+    }
+});
+// mode 0 is per stroke eval, 1 is assess, 2 is convolution
+function cropAndEval(canvas,mode){
     // process image
     // grab corner coordinates
     if (drawingCoords.length >= 2){
@@ -192,73 +245,107 @@ function cropAndEval(canvas){
         var pixels = canvas.getContext('2D').getImageData(Math.floor(drawingCorners.min[0]) * pRatio, Math.floor(drawingCorners.min[1]) * pRatio,
             Math.ceil((drawingCorners.max[0] - Math.floor(drawingCorners.min[0])) * pRatio), Math.ceil((drawingCorners.max[1] - Math.floor(drawingCorners.min[1])) * pRatio));
         // evaluate drawing
-        evalImg(pixels,canvas);
+        evalImg(pixels,canvas,mode);
     }else{
         alert('No drawing');
     }
 }
 
 }
-async function evalImg(img,canvas){
+// mode 0 is per stroke eval, 1 is assess, 2 is convolution
+async function evalImg(img,canvas,mode){
         console.log(img);
         // convert imgData to tf object with 1 color
         var imgTF = tf.browser.fromPixels(img,1);   
         // resize img to 28x28 matching our data
         // var img28 = tf.image.resizeBilinear(imgTF,[28,28]);
         var img28 = tf.image.resizeNearestNeighbor(imgTF,[28,28]);
-        var img300 =tf.image.resizeNearestNeighbor(imgTF,[280,280]);
         // scale value down to between 0 and 1 and covert to grey scale by subtraction
         var scaled = tf.scalar(1.0).sub(img28.div(tf.scalar(255.0)));
         // call model for prediction
         var prediction = model.predict(scaled.expandDims(0)).dataSync();
-        // var firstStep = model.predict(scaled.expandDims(0),model.layers[0].outputs).dataSync();
-        // var firstStep = model.predict(tf.ones(1,28,28,1),model.layers[0].outputs).dataSync();
-        // var firstStep = model.layers[0].apply(scaled.expandDims(0)).dataSync();
-        var firstStep = await model.layers[0].apply(tf.scalar(1.0).sub(img300.div(tf.scalar(255.0))).expandDims(0)).dataSync();
-        // var secStep = await model.layers[1].apply(tf.tensor(firstStep).reshape([280,280,16]).expandDims(0)).dataSync();
-        // console.log(secStep);
-        // var firstStep = model.layers[0].apply(tf.ones([1,28,28,1])).dataSync();
-        filterStep=0;
-        rowStep=0;
-        colStep=0;
-        firstStepOut=[];
-        x=[];
-        y=[];
-        for (var i=0;i<firstStep.length;i++){
-            // console.log(i);
-            if (filterStep==8){
-                if (y.length<279){
-                    y.push(Math.abs(firstStep[i]));
-                    // console.log(y.length);
-                }else{
-                    y.push(Math.abs(firstStep[i]));
-                    x.push(y);
-                    // console.log(y);
-                    y=[];
-                }
-                filterStep++;
-            }else if (filterStep===15){
-                filterStep=0;
-            }else{
-                filterStep++;
-            }
-
-        }            
-        // console.log(x);
-
+        // var secStep = await model.layers[1].apply(tf.tensor(firstStep).reshape([168,168,16]).expandDims(0)).dataSync();
+        
         // find highest predictions
         var probabilities = grabMaxOutput(prediction);
         barUpdate(probabilities);
         // plot some inbetween steps
-        drawProcessed(tf.scalar(1).sub(tf.tensor(x)),img28.toInt());
- 
+        if (mode === 1){
+            var msg = new SpeechSynthesisUtterance(`I think you drew ${probabilities[0][1]}, with ${Math.floor(probabilities[0][0]*100)} percent chance. Was I right?`)
+            window.speechSynthesis.speak(msg);
+            d3.select('#outCanvas').style('visibility','visible');
+            drawProcessed(img28.toInt(),'outCanvas');
+            d3.select('.processedText').style('visibility','visible');
+            var overDiv = d3.select('body').append('div')
+            .attr('id','overlay')
+            .style('background-color', 'rgba(0,0,0,0.5)');
+            overDiv.append('button')
+            .attr('class',"btn btn-primary btn-lg")
+            .attr('id','y')
+            .text('Yes')
+            overDiv.append('button')
+            .attr('class',"btn btn-danger btn-lg")
+            .attr('id','n')
+            .text('No')
+            overDiv.select('#y').on('click',function(){
+                var msg = new SpeechSynthesisUtterance('Great!');
+                window.speechSynthesis.speak(msg);
+                overDiv.remove();
+            });
+            overDiv.select('#n').on('click',function(){
+                var msg = new SpeechSynthesisUtterance('Too bad');
+                window.speechSynthesis.speak(msg);
+                overDiv.remove();
+            });
+        }else if(mode === 2){
+            var img168 =tf.image.resizeNearestNeighbor(imgTF,[168,168]);
+            var firstStep = await model.layers[0].apply(tf.scalar(1.0).sub(img168.div(tf.scalar(255.0))).expandDims(0)).dataSync();
+            filterStep=0;
+            filterOutput={};
+            for (var i=0;i<16;i++){
+                filterOutput[i.toString()]=[];
+            }
+            x=[];
+            y=[];
+            for (var i=0;i<firstStep.length;i++){
+                var iString = filterStep.toString();
+                var currentFLength=filterOutput[iString].length;
+                // console.log(currentFLength)
+                if (currentFLength===0){
+                    filterOutput[iString].push([Math.abs(firstStep[i])]);
+                }else{
+                    var lastArr= filterOutput[iString].pop();
+                    if(lastArr.length<167){
+                        lastArr.push(Math.abs(firstStep[i]));
+                        filterOutput[iString].push(lastArr);
+                    }else{
+                        lastArr.push(Math.abs(firstStep[i]));
+                        filterOutput[iString].push(lastArr);
+                        if (currentFLength<168){
+                            filterOutput[iString].push([]);
+                        }
+                        
+                    }
+                } 
+                if(filterStep===15){
+                    filterStep=0;
+                }else{
+                    filterStep++;
+                }
+            }
+            for (var i=0;i<16;i++){
+                // console.log(filterOutput[i.toString()]);
+                drawProcessed(tf.scalar(1).sub(tf.tensor(filterOutput[i.toString()])),'overCanvas'+i)       
+            } 
+            console.log(filterOutput);
+        }
       
 };
 
 // draw resized image to output canvas
-async function drawProcessed(tensor,tensor2){
-    var convertedImg = await tf.browser.toPixels(tensor,document.getElementById('outCanvas'));
-    var convertedImg = await tf.browser.toPixels(tensor2,document.getElementById('outCanvas2'));
+async function drawProcessed(tensor,canvas){
+    var convertedImg = await tf.browser.toPixels(tensor,document.getElementById(canvas));
+    // var convertedImg = await tf.browser.toPixels(tensor2,document.getElementById('outCanvas2'));
     return convertedImg;
 }
 
@@ -301,19 +388,19 @@ function grabMaxOutput(prediction){
                 topIndices.pop();
             }
         }
-    console.log('Probabilities')
+    // console.log('Probabilities')
     topIndices.forEach(function(index){
         maxOut.push([prediction[index],categ25[index]]);
-        console.log(prediction[index]);
-        console.log(categ25[index]);
+        // console.log(prediction[index]);
+        // console.log(categ25[index]);
     })
     return maxOut;
 }
 
 
-var barColors=['red','blue','orange','yellow','green'];
+var barColors=['red','blue','orange','gold','green'];
 function drawBar(data){
-    var probabilities = data.map(d=>(d[0]*100));
+    var probabilities = data.map(d=>(Math.ceil(d[0]*10000)/100));
     var categoryNames = data.map(d=>d[1]);
     var width = 400,
         scaleFactor = 7,
@@ -340,8 +427,8 @@ function drawBar(data){
                 return d * scaleFactor;
        })
        .attr("height", barHeight - 1)
-       .attr("fill",function(d){
-            return barColors[Math.floor(d/10)];
+       .attr("fill",function(d,i){
+            return barColors[i];
        });
 
     bar.append("text")
@@ -356,7 +443,7 @@ function barUpdate(data){
     var width = 400,
         scaleFactor = 7,
         barHeight = 40;
-    var probabilities = data.map(d=>(d[0]*100));
+    var probabilities = data.map(d=>(Math.ceil(d[0]*10000)/100));
     var categoryNames = data.map(d=>d[1]);
     var barDiv =d3.select("#graph");
     var rectGroup = barDiv.selectAll("rect")
@@ -366,9 +453,14 @@ function barUpdate(data){
         .duration(1000)
         .attr("width", function(d) {
             return d * scaleFactor;
-   }).attr("fill",function(d){
-    return barColors[Math.floor(d/10)];
+   }).attr("fill",function(d,i){
+    return barColors[i];
     });
+    barDiv.selectAll('text').data(probabilities)
+    .attr("x", function(d) { return (d*scaleFactor); })
+    .attr("y", barHeight / 2)
+    .attr("dy", ".35em")
+    .text(function(d) { return d; });
 }
 // Draw dummy bar
 drawBar([[.35,'a'],[.25,'b'],[.15,'c'],[.10,'d'],[.05,'e']]);

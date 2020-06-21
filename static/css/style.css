@@ -8,6 +8,23 @@
   background-blend-mode: lighten;
 }
 
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(10,10,10,0.9); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  /* cursor: pointer; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .col-md-2 {
   margin-left: 60px;
 }
@@ -24,7 +41,9 @@
 } */
 
 svg text {
-     fill:white;
+     fill:AliceBlue;
     font: 20px sans-serif;
     text-anchor: end;
 }
+
+
