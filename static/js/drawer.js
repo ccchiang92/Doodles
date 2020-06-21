@@ -279,14 +279,17 @@ async function evalImg(img,canvas,mode){
             var overDiv = d3.select('body').append('div')
             .attr('id','overlay')
             .style('background-color', 'rgba(0,0,0,0.5)');
-            overDiv.append('button')
+            var overDivCon=overDiv.append('div').attr('class','fluid-container align-middle justify-content-center')
+            overDivCon.append('button')
             .attr('class',"btn btn-primary btn-lg")
             .attr('id','y')
             .text('Yes')
-            overDiv.append('button')
+            overDivCon.append('button')
             .attr('class',"btn btn-danger btn-lg")
             .attr('id','n')
             .text('No')
+            overDivCon.append('div').attr('class','row').append('canvas').attr('id','assessCan');
+            drawProcessed(img28.resizeNearestNeighbor([168,168]).toInt(),'assessCan'),
             overDiv.select('#y').on('click',function(){
                 var msg = new SpeechSynthesisUtterance('Great!');
                 window.speechSynthesis.speak(msg);
