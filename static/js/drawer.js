@@ -189,7 +189,7 @@ assessBTN.on('click',function(){
 });
 
 detailBTN.on('click',function(){
-    if (assessed =true){
+    if (assessed ==true){
         var overDiv = d3.select('body').append('div')
         .attr('id','overlay');
         overDiv.append('button')
