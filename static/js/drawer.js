@@ -58,6 +58,7 @@ function makeResponsive(){
     let initCan = d3.select('#canvasDiv');
     if (!initCan.empty()) {
         initCan.remove();
+        alert('Window resized, drawings wiped and canvas reset');
     }
     var Height = window.innerHeight*0.55;
     var Width = window.innerWidth*0.45;
@@ -250,8 +251,9 @@ function cropAndEval(canvas,mode){
         alert('No drawing');
     }
 }
-
 }
+
+
 // mode 0 is per stroke eval, 1 is assess, 2 is convolution
 async function evalImg(img,canvas,mode){
         console.log(img);
@@ -399,6 +401,73 @@ function grabMaxOutput(prediction){
     })
     return maxOut;
 }
+landing();
+function landing(){
+        var overDiv = d3.select('body').append('div').attr('id','overlay');
+        overDiv.append('button')
+            .attr('class',"btn btn-success btn-lg align-middle")
+            .attr('id','close')
+            .text('Start Drawing')
+            .style('position', 'absolute')
+            .style('bottom','40px')
+            .style('transform', 'translateX(-50%)')
+        overDiv.append('button')
+            .attr('class',"btn btn-primary btn-lg align-middle")
+            .attr('id','next')
+            .text('Next Slide')
+            .style('position', 'absolute')
+            .style('top','40px')
+            .style('transform', 'translateX(-50%)')
+            // .style('left','40px')
+        overDiv.transition().duration(1000).style("background-color", "rgba(255,255,255,0.95)");
+        var overCon = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center');
+        var row1 = overCon.append('div').attr('class','row fluid-container align-middle justify-content-center');
+        var row2 = overCon.append('div').attr('class','row fluid-container align-middle justify-content-center');
+        var catGif =row1.append('img').attr('src', './static/images/landing.gif').style("opacity", 0);;
+        var text1 = row2.append('h2').style("opacity", 0);
+        var text2 = row2.append('h2').style("opacity", 0)
+        catGif.transition().delay(1000).duration(2000).style("opacity", 1);
+        text1.transition().delay(1500).duration(1000).text("Welcome to <project name>, Our Final Project for Berkeley's Data Analytics Bootcamp")
+        .attr('class','text-black text-align-middle align-middle').style("opacity", 1);
+        text1.transition().delay(5000).duration(500).style("opacity", 0);
+        text2.transition().delay(2500).duration(1000).style("opacity", 1)
+                .text("This is a convolution neural network showcase using google's quickdraw dataset and tensorflow").attr('class','text-align-middle text-black align-middle');
+        var step=0;
+        overDiv.select('#next').on('click',function(){
+            switch (step){
+                case 0 :
+                text2.transition().delay(500).duration(500).style("opacity", 0);
+                text1.transition().delay(2000).duration(1000).text("On this website, you'll be able to draw on a canvas from number of categories").style("opacity", 1);
+                text1.transition().delay(7000).duration(500).style("opacity", 0);
+                text2.transition().delay(3500).duration(1000).text("The computer will try to identify what is drawn and  generating number of guesses along with the probabilities").style("opacity", 1)
+                step ++ ;
+                break
+                case 1 :
+                    var cnnFig =row1.append('img').attr('src', './static/images/CNN.jpeg').style("opacity", 0).style('height','40%').style('width','40%').style('vertical-align','bottom');
+                    cnnFig.transition().delay(2000).duration(2000).style("opacity", 1);
+                    text2.transition().delay(1000).duration(500).style("opacity", 0);
+                    text1.transition().delay(2500).duration(1000).text('We have trained our model on 30 different categories with 16000 images for each category').style("opacity", 1);
+                    text2.transition().delay(4500).duration(1000).text('We trained the model with tensorflow keras on google collab in python, and built the front-end with d3, bootstrap and more').style("opacity", 1);
+                    step ++ ;
+                    break
+                case 2:
+                    text1.transition().delay(500).duration(500).style("opacity", 0);
+                    text2.transition().delay(500).duration(500).style("opacity", 0);
+                    text1.transition().delay(1500).duration(1000).text('There are tons to explore such as fun mini game elements, neural network visualization and summary').style("opacity", 1);
+                    text2.transition().delay(3000).duration(1000).text('Links are on the top and bottom to github for source code, data sources, resources, our profile pages and more').style("opacity", 1);
+                    text1.transition().delay(9000).duration(500).text('Click the buttons to start drawing');
+                    text2.transition().delay(9000).duration(500).style("opacity", 0);
+                    step ++ ;
+                    break
+                case 3:
+                    overDiv.remove();
+                    break
+                }
+        })
+        overDiv.select('#close').on('click',function(){
+            overDiv.remove();
+        })
+    }
 
 
 var barColors=['red','blue','orange','gold','green'];
@@ -406,7 +475,7 @@ function drawBar(data){
     var probabilities = data.map(d=>(Math.ceil(d[0]*10000)/100));
     var categoryNames = data.map(d=>d[1]);
     var width = 400,
-        scaleFactor = 7,
+        scaleFactor = 4,
         barHeight = 40;
     var barDiv =d3.select("#graph");
     // placeholder
@@ -444,7 +513,7 @@ function drawBar(data){
 // Incomplete
 function barUpdate(data){
     var width = 400,
-        scaleFactor = 7,
+        scaleFactor = 4,
         barHeight = 40;
     var probabilities = data.map(d=>(Math.ceil(d[0]*10000)/100));
     var categoryNames = data.map(d=>d[1]);
