@@ -47,9 +47,40 @@ html, body {
 } */
 
 svg text {
-     fill:AliceBlue;
+    fill:DarkSlateGrey;
     font: 20px sans-serif;
     text-anchor: end;
 }
+.clusterize-scroll{
+  border:2px solid lightgrey;
+}
 
 
+.tooltipText{
+  /* position: relative; */
+  visibility: hidden;
+  width: 150px;
+  background-color: rgba(10,10,10,0.6); 
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 3px 0;
+  font: 11px sans-serif;
+  position: absolute;
+  z-index: 1;
+}
+.toolLeft{
+  transform: translateY(-120%)
+}
+.toolTop{
+  transform: translateY(-120%)
+}
+.toolBot{
+  transform: translateY(120%)
+}
+.toolAs{
+  transform: translateY(-120%);
+}
+.toolCon{
+  transform: translateY(80%);
+}

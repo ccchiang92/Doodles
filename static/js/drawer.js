@@ -1,6 +1,6 @@
 // Drawing canvas js by Chris Chiang
 // Init
-// Setup categories
+// Setup categories for hard coded list
 var categories = ['Animals','Fruits','Vehicles'];
 var easy30 = ['bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','shark','snake','apple','banana','grapes','pear','pineapple','strawberry','airplane','bicycle','bus','car','submarine','truck','sailboat','train','van'];
 var drawings ={
@@ -28,7 +28,7 @@ var drawingCoords =[];
 var countingDown = false;
 var assessed =false;
 var model;
-// add list of drawings
+// add list of categories
 d3.select(".clusterize-content")
 .selectAll("ul")
 .data(drawings[currentTopic])
@@ -46,6 +46,7 @@ var clusterize = new Clusterize({
 
 // Draw canvas and setup event listeners
 function makeResponsive(){
+    // reset if needed
     let initCan = d3.select('#canvasDiv');
     if (!initCan.empty()) {
         initCan.remove();
@@ -53,8 +54,10 @@ function makeResponsive(){
             drawingCoords =[];
             alert('Window resized, drawings wiped and canvas reset');}
     }
-    var Height = window.innerHeight*0.65;
-    var Width = window.innerWidth*0.45;
+    // size base on window size
+    const Height = window.innerHeight*0.65;
+    const Width = window.innerWidth*0.45;
+    // create new fabric canvas
     var drawCanvasDiv = d3.select('.canvasDiv')
         .append('div')
         .attr('id','canvasDiv')
@@ -67,10 +70,9 @@ function makeResponsive(){
     var canvas =  new fabric.Canvas('c', {
         isDrawingMode: false
       });
-    // set up a array to store stroke coordinates
-    // Set background to white
+    // Set background to white and canvas parameters
     canvas.backgroundColor = '#ffffff';
-    canvas.freeDrawingBrush.width = 7;
+    canvas.freeDrawingBrush.width = 16;
     canvas.freeDrawingBrush.color = 'black';
     canvas.freeDrawingCursor= 'url(./static/images/pencil.png) 0 40, crosshair';
     // setup canvas event listeners
@@ -80,6 +82,8 @@ function makeResponsive(){
     canvas.on('mouse:up',function(){
         isDrawing=false;
         if (canvas.isDrawingMode){
+            // var coord = canvas.getPointer(event);
+            // drawingCoords.push(coord)
             cropAndEval(canvas,0);
         }
     });
@@ -101,11 +105,12 @@ newTopBTN.on('click',function(){
     var tempIndex = Math.floor(Math.random() * tempCategories.length)
     currentTopic=tempCategories[tempIndex];
     topic.text('Category: '+currentTopic);
+    // reset canvas for new drawing
     canvas.clear();
     drawingCoords =[];
     canvas.backgroundColor = '#ffffff';
     assessed=false;
-
+    // write new categories
     d3.select(".clusterize-content").selectAll("li").remove()
     d3.select(".clusterize-content")
     .selectAll("ul")
@@ -128,6 +133,7 @@ resetBTN.on('click',function(){
 // Start drawing canvas and start up timer
 startBTN.on('click',function(){
     if (!countingDown){
+        // reset canvas before starting
         var msg = new SpeechSynthesisUtterance('you have 30 seconds to draw')
         window.speechSynthesis.speak(msg);
         countingDown= true;
@@ -136,6 +142,7 @@ startBTN.on('click',function(){
         drawingCoords =[];
         canvas.backgroundColor = '#ffffff';
         canvas.isDrawingMode= true;
+        // setup timer interval
         var rTime = 30;
         var timerText =d3.select('.timer');
         timerText.text(`You have ${rTime} secs`).transition().duration(500).style("color","green");
@@ -143,6 +150,7 @@ startBTN.on('click',function(){
         var countDown = setInterval(function(){
             rTime = rTime -1
             timerText.text(`You have ${rTime} secs`);
+            // remove timer and assess image
             if (rTime==0){
                 canvas.isDrawingMode = false;
                 countingDown= false;
@@ -155,6 +163,7 @@ startBTN.on('click',function(){
         }, 1000);}
 });
 // Some extra buttons
+// allow free drawing on canvas
 freeBTN.on('click',function(){
     canvas.isDrawingMode =true;
 });
@@ -169,7 +178,7 @@ testBTN.on('click',function(){
     canvas.backgroundColor = '#ffffff';
     alert('Test Success')
 });
-
+// save canvas drawing, not supported in some browsers
 saveBTN.on('click',function(){
     if (!fabric.Canvas.supports('toDataURL')) {
         alert('Can not save image on this brower, try firefox');
@@ -186,9 +195,10 @@ assessBTN.on('click',function(){
     cropAndEval(canvas,1);
     assessed =true;
 });
-
+// Plot overlay and intermediate outputs
 detailBTN.on('click',function(){
     if (assessed ==true){
+        // overlay buttons and text
         var overDiv = d3.select('body').append('div')
         .attr('id','overlay');
         overDiv.append('button')
@@ -206,6 +216,7 @@ detailBTN.on('click',function(){
                 .text("Below are the outputs of our first CNN model layer, a 2D convolution layer.")
                 .attr('class','text-white align-middle')
                 .append('h2').text('The input image is convoluted with 16 different 3x3 matrices to generate 16 different images.').attr('class','text-white align-middle');
+        // Setup canvas
         var row1 = conDiv.append('div').attr('class','row justify-content-center');
         var row2 = conDiv.append('div').attr('class','row justify-content-center');
         for (var i=0; i<16;i++){
@@ -215,7 +226,9 @@ detailBTN.on('click',function(){
                 row2.append('canvas').attr('id','overCanvas'+i).style('padding','10px');
             }
         }
+        // draw output
         cropAndEval(canvas,2);
+        // secondary pooling step images
         overDiv.append('button')
             .attr('class',"btn btn-light btn-lg float-right")
             .attr('id','pooling')
@@ -237,7 +250,7 @@ detailBTN.on('click',function(){
         alert('Assess an image first!')
     }
 });
-// mode 0 is per stroke eval, 1 is assess, 2 is convolution
+// mode 0 is per stroke eval, 1 is assess, 2 is convolution, 3 is pooling
 function cropAndEval(canvas,mode){
     // process image
     // grab corner coordinates
@@ -247,8 +260,8 @@ function cropAndEval(canvas,mode){
         drawingCorners={min:[Math.min(...xCoords),Math.min(...yCoords)],max:[Math.max(...xCoords),Math.max(...yCoords)]};
         // Use the corners to grab pixel data array of the drawing
         var pRatio = window.devicePixelRatio;
-        var pixels = canvas.getContext('2D').getImageData(Math.floor(drawingCorners.min[0]) * pRatio, Math.floor(drawingCorners.min[1]) * pRatio,
-            Math.ceil((drawingCorners.max[0] - Math.floor(drawingCorners.min[0])) * pRatio), Math.ceil((drawingCorners.max[1] - Math.floor(drawingCorners.min[1])) * pRatio));
+        var pixels = canvas.getContext('2D').getImageData(Math.floor(drawingCorners.min[0] * pRatio), Math.floor(drawingCorners.min[1] * pRatio),
+            Math.ceil((drawingCorners.max[0] - Math.floor(drawingCorners.min[0])) * pRatio)+2, Math.ceil((drawingCorners.max[1] - Math.floor(drawingCorners.min[1])) * pRatio)+2);
         // evaluate drawing
         evalImg(pixels,canvas,mode);
     }else{
@@ -263,8 +276,7 @@ async function evalImg(img,canvas,mode){
         // convert imgData to tf object with 1 color
         var imgTF = tf.browser.fromPixels(img,1);   
         // resize img to 28x28 matching our data
-        // var img28 = tf.image.resizeBilinear(imgTF,[28,28]);
-        var img28 = tf.image.resizeNearestNeighbor(imgTF,[28,28]);
+        var img28 = tf.image.resizeBilinear(imgTF,[28,28]);
         // scale value down to between 0 and 1 and covert to grey scale by subtraction
         var scaled = tf.scalar(1.0).sub(img28.div(tf.scalar(255.0)));
         // call model for prediction
@@ -272,8 +284,9 @@ async function evalImg(img,canvas,mode){
         
         // find highest predictions
         var probabilities = grabMaxOutput(prediction);
+        // Draw predictions
         barUpdate(probabilities);
-        // plot some inbetween steps
+        // Assess overlay and images
         if (mode === 1){
             var msg = new SpeechSynthesisUtterance(`I think you drew ${probabilities[0][1]}, with ${Math.floor(probabilities[0][0]*100)} percent chance. Was I right?`)
             window.speechSynthesis.speak(msg);
@@ -304,15 +317,17 @@ async function evalImg(img,canvas,mode){
                 window.speechSynthesis.speak(msg);
                 overDiv.remove();
             });
+        // Draw convolution layer
         }else if(mode === 2){
             var img168 =tf.image.resizeNearestNeighbor(imgTF,[168,168]);
             var firstStep = await model.layers[0].apply(tf.scalar(1.0).sub(img168.div(tf.scalar(255.0))).expandDims(0)).dataSync();
-            
+            // reshape first step output to 16x168x168 for plotting 16 images
             filterStep=0;
             filterOutput={};
             for (var i=0;i<16;i++){
                 filterOutput[i.toString()]=[];
             }
+            // converting 1d array to a 16 length object where each element is a 2d image array
             for (var i=0;i<firstStep.length;i++){
                 var iString = filterStep.toString();
                 var currentFLength=filterOutput[iString].length;
@@ -330,7 +345,6 @@ async function evalImg(img,canvas,mode){
                         if (currentFLength<168){
                             filterOutput[iString].push([]);
                         }
-                        
                     }
                 } 
                 if(filterStep===15){
@@ -339,11 +353,12 @@ async function evalImg(img,canvas,mode){
                     filterStep++;
                 }
             }
+            // draw to canvas
             for (var i=0;i<16;i++){
-                // console.log(filterOutput[i.toString()]);
+                // convert 2d array into tensor object and convert from grayscale to rgba
                 drawProcessed(tf.scalar(1).sub(tf.tensor(filterOutput[i.toString()])),'overCanvas'+i)       
-            // console.log(filterOutput);
         } 
+        // Pooling plots, same as convolution just smaller
         }else if(mode === 3){
             var img168 =tf.image.resizeNearestNeighbor(imgTF,[168,168]);
             var firstStep = await model.layers[0].apply(tf.scalar(1.0).sub(img168.div(tf.scalar(255.0))).expandDims(0)).dataSync();
@@ -379,20 +394,18 @@ async function evalImg(img,canvas,mode){
             }
             for (var i=0;i<16;i++){
                 drawProcessed(tf.tensor(filterOutput[i.toString()]),'overCanvas'+i);
-                // console.log(filterOutput[i.toString()]);
             } 
-            console.log(filterOutput);
         }
       
 };
 
-// draw resized image to output canvas
+// draw tensor image object to output canvas
 async function drawProcessed(tensor,canvas){
     var convertedImg = await tf.browser.toPixels(tensor,document.getElementById(canvas));
     return convertedImg;
 }
 
-
+// handel resizing
 makeResponsive();
 d3.select(window).on('resize', makeResponsive);
 
@@ -416,7 +429,7 @@ async function loadCategories(){
 loadModel();
 loadCategories();
 
-// grab top 5 index and probabilities from prediction output
+// helper function to grab top 5 index and probabilities from prediction output
 // return 5 length array, each element is [probability,category_name] 
 function grabMaxOutput(prediction){
     var topIndices = [];
@@ -439,8 +452,10 @@ function grabMaxOutput(prediction){
     })
     return maxOut;
 }
+// Landing overlay slide animation code
 landing();
 function landing(){
+        //add overlay div, buttons, text and img 
         var overDiv = d3.select('body').append('div').attr('id','overlay');
         overDiv.append('button')
             .attr('class',"btn btn-success btn-lg align-middle")
@@ -456,7 +471,6 @@ function landing(){
             .style('position', 'absolute')
             .style('top','40px')
             .style('transform', 'translateX(-50%)')
-            // .style('left','40px')
         overDiv.transition().duration(1000).style("background-color", "rgba(255,255,255,0.95)");
         var overCon = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center');
         var row1 = overCon.append('div').attr('class','row fluid-container align-middle justify-content-center');
@@ -470,6 +484,7 @@ function landing(){
         text1.transition().delay(5000).duration(500).style("opacity", 0);
         text2.transition().delay(2500).duration(1000).style("opacity", 1)
                 .text("This is a convolution neural network showcase using google's quickdraw dataset and tensorflow").attr('class','text-align-middle text-black align-middle');
+        // Next slide button, each case is a slide, changing text and elements
         var step=0;
         overDiv.select('#next').on('click',function(){
             switch (step){
@@ -507,7 +522,19 @@ function landing(){
                 }
         })
         overDiv.select('#close').on('click',function(){
-            overDiv.remove();   
+            overDiv.remove();
+            createButtonTooltips();
         })
     }
+// tooltip hovers
+function createButtonTooltips(){
+    var buttonsTooltip = d3.selectAll('.btn');
+    buttonsTooltip.on("mouseover", function() {
+        d3.select('#'+this.id.toString()).selectAll('.tooltipText').style('visibility','visible');
+    })
+    buttonsTooltip.on("mouseout", function() {
+        d3.select('#'+this.id.toString()).selectAll('.tooltipText').style('visibility','hidden');
+    });
+}
+
 

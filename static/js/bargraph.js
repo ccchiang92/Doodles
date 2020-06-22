@@ -1,5 +1,5 @@
 
-var barColors=['red','blue','orange','gold','green'];
+var barColors=['red','orange','gold','blue','green'];
 function drawBar(data){
     var probabilities = data.map(d=>(Math.ceil(d[0]*10000)/100));
     var categoryNames = data.map(d=>d[1]);
@@ -7,9 +7,7 @@ function drawBar(data){
         scaleFactor = 4,
         barHeight = 40;
     var barDiv =d3.select("#graph");
-    // placeholder
-    var text = barDiv.append('p').text(categoryNames);
-    // 
+    barDiv.append('h6').text('Starting drawing and press the Assess button for predictions').style('color','darkred');
     var graph = barDiv
                   .append("svg")
                   .attr("width", width)
@@ -32,14 +30,13 @@ function drawBar(data){
             return barColors[i];
        });
 
-    bar.append("text")
-       .attr("x", function(d) { return (d*scaleFactor); })
+       bar.append("text")
+       .attr("x", 50* scaleFactor)
        .attr("y", barHeight / 2)
        .attr("dy", ".35em")
-       .text(function(d) { return d; });
+       .text(function(d) { return d+'%'});
     }
 
-// Incomplete
 function barUpdate(data){
     var width = 400,
         scaleFactor = 4,
@@ -48,7 +45,7 @@ function barUpdate(data){
     var categoryNames = data.map(d=>d[1]);
     var barDiv =d3.select("#graph");
     var rectGroup = barDiv.selectAll("rect")
-    barDiv.select('p').text(categoryNames);
+    barDiv.select('h6').text(`Our top prediction is: ${categoryNames[0]} with ${probabilities[0]}% confidence.`);
     rectGroup.data(probabilities);
     rectGroup.transition()
         .duration(1000)
@@ -58,11 +55,11 @@ function barUpdate(data){
     return barColors[i];
     });
     barDiv.selectAll('text').data(data)
-    .attr("x", function(d) { return (d[0]*100*scaleFactor); })
+    .attr("x", 50*scaleFactor)
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
-    .text(function(d) { return Math.round(d[0]*100) + "% " + d[1]; });
+    .text(function(d) { return Math.round(d[0]*10000)/100 + "% " + d[1]; });
 }
 // Draw dummy bar
-drawBar([[.35,'a'],[.25,'b'],[.15,'c'],[.10,'d'],[.05,'e']]);
+drawBar([[.35,'Apple'],[.25,'b'],[.15,'c'],[.10,'d'],[.05,'e']]);
 
