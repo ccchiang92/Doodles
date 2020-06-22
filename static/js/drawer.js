@@ -476,7 +476,7 @@ function landing(){
             .style('position', 'absolute')
             .style('top','40px')
             .style('transform', 'translateX(-50%)')
-        overDiv.transition().duration(1000).style("background-color", "rgba(255,255,255,0.95)");
+        overDiv.transition().duration(1000).style("background-color", "rgba(200,200,200,0.82)");
         var overCon = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center');
         var row1 = overCon.append('div').attr('class','row fluid-container align-middle justify-content-center');
         var row2 = overCon.append('div').attr('class','row fluid-container align-middle justify-content-center');
@@ -486,7 +486,7 @@ function landing(){
         catGif.transition().delay(1000).duration(2000).style("opacity", 1);
         text1.transition().delay(1500).duration(1000).text("Welcome to ABC Smart Doodler by team Axel, Brian and Chris, our Final Project for Berkeley's Data Analytics Bootcamp")
         .attr('class','text-black text-align-middle align-middle').style("opacity", 1);
-        text1.transition().delay(5000).duration(500).style("opacity", 0);
+        text1.transition().delay(6000).duration(500).style("opacity", 0);
         text2.transition().delay(2500).duration(1000).style("opacity", 1)
                 .text("This is a convolution neural network showcase using google's quickdraw dataset and tensorflow").attr('class','text-align-middle text-black align-middle');
         // Next slide button, each case is a slide, changing text and elements
@@ -512,7 +512,7 @@ function landing(){
                     break
                 case 2:
                     var text3 = row2.append('h2').style("opacity", 0).attr('class','text-black text-align-middle align-middle')
-                    overDiv.transition().duration(500).style("background-color", "rgba(255,255,255,0.95)");
+                    overDiv.transition().duration(500).style("background-color", "rgba(255,255,255,0.85)");
                     text1.transition().delay(500).duration(500).style("opacity", 0);
                     text2.transition().delay(500).duration(500).style("opacity", 0);
                     text1.transition().delay(1500).duration(1000).text('There are tons to explore such as fun mini game elements, neural network visualization and summary').style("opacity", 1);
