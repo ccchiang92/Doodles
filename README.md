@@ -15,11 +15,11 @@ Google generiously has the entire data set available for public use. This consis
 ###### Extract
 - Pull data from Google Cloud using .
 ```tf.keras.utils.get_file()```
-- Loop through the downloaded files, Use ```np.load() ```to extract load the data into one array narrays / enumarate another array for label classification / and a list of the actual labe name extracted from the file name.
+- Loop through the downloaded files, Used ```np.load() ```to extract load the data into one array narrays / enumarate another array for label classification / and a list of the actual labe name extracted from the file name.
 
 
 ###### Transform
-- One hot encoding for our label array.
+- One hot encoding for our label array.`
 ```y = tf.keras.utils.to_categorical(y, num_classes=len(label_names))```
 - Sequential Models take in 4D arrays so we reshape.
 --* change the data type to save some memory and quantize the data to values between 0 and 1.
@@ -44,6 +44,8 @@ Google generiously has the entire data set available for public use. This consis
 
 #### Visualization
 
+Results
+------
 
 
 
