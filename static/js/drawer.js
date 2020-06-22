@@ -82,12 +82,9 @@ function makeResponsive(){
     canvas.on('mouse:up',function(){
         isDrawing=false;
         if (canvas.isDrawingMode){
-            // var coord = canvas.getPointer(event);
-            // drawingCoords.push(coord)
             cropAndEval(canvas,0);
         }
     });
-    
     // store stroke coordinates when drawing and within bounds
     canvas.on('mouse:move',function(event) {
         if (isDrawing & canvas.isDrawingMode){
@@ -266,7 +263,7 @@ function cropAndEval(canvas,mode){
         // Use the corners to grab pixel data array of the drawing
         var pRatio = window.devicePixelRatio;
         var pixels = canvas.getContext('2D').getImageData(Math.floor(drawingCorners.min[0] * pRatio), Math.floor(drawingCorners.min[1] * pRatio),
-            Math.ceil((drawingCorners.max[0] - Math.floor(drawingCorners.min[0])) * pRatio)+2, Math.ceil((drawingCorners.max[1] - Math.floor(drawingCorners.min[1])) * pRatio)+2);
+            Math.ceil((drawingCorners.max[0] - Math.floor(drawingCorners.min[0])) * pRatio)+2, Math.ceil((drawingCorners.max[1] - Math.floor(drawingCorners.min[1]))  * pRatio)+2);
         // evaluate drawing
         evalImg(pixels,canvas,mode);
     }else{
