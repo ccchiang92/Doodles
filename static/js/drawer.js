@@ -213,7 +213,7 @@ detailBTN.on('click',function(){
         overDiv.select('#close').on('click',function(){
             overDiv.remove();
         })
-        conDiv = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center');
+        conDiv = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center text-center');
         conDiv.append('div').attr('class','ovRow1 row justify-content-center').append('h2')
                 .text("Below are the outputs of our first CNN model layer, a 2D convolution layer.")
                 .attr('class','text-white align-middle')
@@ -464,28 +464,28 @@ function landing(){
             .attr('id','close')
             .text('Start Drawing')
             .style('position', 'absolute')
-            .style('bottom','40px')
-            .style('transform', 'translateX(-50%)')
+            .style('top','30px')
+            .style('transform', 'translateX(80%)');
         overDiv.append('button')
             .attr('class',"btn btn-primary btn-lg align-middle")
             .attr('id','next')
-            .text('Next Slide')
+            .text('Next Slide') 
             .style('position', 'absolute')
-            .style('top','40px')
-            .style('transform', 'translateX(-50%)')
+            .style('top','30px')
+            .style('transform', 'translateX(-80%)');
         overDiv.transition().duration(1000).style("background-color", "rgba(200,200,200,0.82)");
-        var overCon = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center');
-        var row1 = overCon.append('div').attr('class','row fluid-container align-middle justify-content-center');
-        var row2 = overCon.append('div').attr('class','row fluid-container align-middle justify-content-center');
-        var catGif =row1.append('img').attr('src', './static/images/landing.gif').style("opacity", 0);;
-        var text1 = row2.append('h2').style("opacity", 0);
-        var text2 = row2.append('h2').style("opacity", 0)
+        var overCon = overDiv.append('div').attr('class','container align-middle justify-content-center');
+        var row1 = overCon.append('div').attr('class','row container-fluid justify-content-center text-center');
+        var row2 = overCon.append('div').attr('class','row align-middle justify-content-center text-center');
+        var catGif =row1.append('img').attr('src', './static/images/landing.gif').style("opacity", 0).style('width','70%').attr('class','float-left img-fluid');
+        var text1 = row2.append('h3').style("opacity", 0);
+        var text2 = row2.append('h3').style("opacity", 0);
         catGif.transition().delay(1000).duration(2000).style("opacity", 1);
         text1.transition().delay(1500).duration(1000).text("Welcome to ABC Smart Doodler by team Axel, Brian and Chris, our Final Project for Berkeley's Data Analytics Bootcamp")
-        .attr('class','text-black text-align-middle align-middle').style("opacity", 1);
+        .attr('class','text-black align-self-center').style("opacity", 1);
         text1.transition().delay(6000).duration(500).style("opacity", 0);
         text2.transition().delay(2500).duration(1000).style("opacity", 1)
-                .text("This is a convolution neural network showcase using google's quickdraw dataset and tensorflow").attr('class','text-align-middle text-black align-middle');
+                .text("This is a convolution neural network showcase using google's quickdraw dataset and tensorflow").attr('class','text-black align-self-center');
         // Next slide button, each case is a slide, changing text and elements
         var step=0;
         overDiv.select('#next').on('click',function(){
@@ -500,7 +500,7 @@ function landing(){
                 break
                 case 1 :
                     overDiv.transition().duration(500).style("background-color", "lightblue");
-                    var cnnFig =row1.append('img').attr('src', './static/images/CNN.jpeg').style("opacity", 0).style('height','40%').style('width','40%').style('vertical-align','bottom');
+                    var cnnFig =row1.append('img').attr('src', './static/images/CNN.jpeg').style("opacity", 0).style('width','40%').style('vertical-align','bottom').attr('class','float-right .img-fluid');
                     cnnFig.transition().delay(2000).duration(2000).style("opacity", 1);
                     text2.transition().delay(1000).duration(500).style("opacity", 0);
                     text1.transition().delay(2500).duration(1000).text('We have trained our model on 30 different categories with 16000 images for each category').style("opacity", 1);
@@ -508,13 +508,13 @@ function landing(){
                     step ++ ;
                     break
                 case 2:
-                    var text3 = row2.append('h2').style("opacity", 0).attr('class','text-black text-align-middle align-middle')
+                    var text3 = row2.append('h5').style("opacity", 0).attr('class','text-danger align-middle');
                     overDiv.transition().duration(500).style("background-color", "rgba(255,255,255,0.85)");
                     text1.transition().delay(500).duration(500).style("opacity", 0);
                     text2.transition().delay(500).duration(500).style("opacity", 0);
                     text1.transition().delay(1500).duration(1000).text('There are tons to explore such as fun mini game elements, neural network visualization and summary').style("opacity", 1);
                     text2.transition().delay(3000).duration(1000).text('Links are on the top and bottom to github for source code, data sources, resources, our profile pages and more').style("opacity", 1);
-                    text3.transition().delay(9000).duration(500).text('Click the buttons to start drawing').style("opacity", 1).attr('class','text-black text-align-middle align-middle');;
+                    text3.transition().delay(9000).duration(500).text('Click the buttons to start drawing').style("opacity", 1);
                     overDiv.select('#next').text('Start Drawing')
                     step ++ ;
                     break
