@@ -78,6 +78,9 @@ svg text {
 .toolBot{
   transform: translateY(120%)
 }
+.toolSlide{
+  transform: translateY(60%)
+}
 .toolAs{
   transform: translateY(-120%);
 }
