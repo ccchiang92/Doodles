@@ -38,7 +38,11 @@ Google generiously has the entire data set available for public use. This consis
 
 
 #### HTML / Javascript
+- Use Bootstrap for general HTML layout and formatting.
+- HTML canvas will be the element that the user can interact and "draw" on.
+- Used a js library called fabric to handle the "drawing" actions.
 
+#### Visualization
 
 
 
