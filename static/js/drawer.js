@@ -187,6 +187,11 @@ saveBTN.on('click',function(){
         window.open(canvas.toDataURL('png'));
       }
 });
+// line width changer
+d3.select('#drawing-width').on('change',function(){
+    canvas.freeDrawingBrush.width = this.value;
+    d3.select('#widthNum').text(this.value);
+})
 
 
 // Evaluate current image
@@ -535,6 +540,13 @@ function createButtonTooltips(){
     buttonsTooltip.on("mouseout", function() {
         d3.select('#'+this.id.toString()).selectAll('.tooltipText').style('visibility','hidden');
     });
+    d3.select('#widthButton').on("mouseover", function() {
+        d3.select('#'+this.id.toString()).selectAll('.tooltipText').style('visibility','visible');
+    })
+    d3.select('#widthButton').on("mouseout", function() {
+        d3.select('#'+this.id.toString()).selectAll('.tooltipText').style('visibility','hidden');
+    });
 }
+
 
 

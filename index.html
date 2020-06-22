@@ -73,7 +73,8 @@
                 <ul id="contentArea" class="clusterize-content"></ul>
               </div>
               <br>
-              <p style="font-size: x-small; color:brown">Model not preforming? Try grapes, snake, banana, strawberry or camel<br>
+              <p style="font-size: x-small; color:brown">Model not preforming? Try increasing the brush width, which helps with image resize tolerance. <br>
+              Or try drawing grapes, snake, banana, strawberry or camel<br>
               These are just some examples the model is good at recognizing </p>
             </div>
             
@@ -101,9 +102,14 @@
                 <button id='reset' type="button" class="btn btn-sm btn-outline-danger">
                   <span class="tooltipText toolBot">Clear and reset canvas</span>
                   Reset Canvas</button>
-                <button id='save' type="button" class="btn btn-sm btn-outline-dark">
+                <button id='save' type="button" class="btn btn-sm btn-outline-info">
                   <span class="tooltipText toolBot">Save current drawing, not supported on all browsers</span>
                   Download Drawing</button>
+                  <span id='widthButton' class='btn-sm btn-outline-dark' style="border:1.5px solid grey;">
+                  <span style='color: gold;' class="tooltipText toolBot">Warning!! Changing the stroke size will drastically change how the model performs</span>
+                  <label for= 'drawing-width' style="padding: 5px;">Brush Width</label>
+                  <span id='widthNum'>16</span><input type="range" value="16" min="12" max="50" id="drawing-width">
+                  </span>
               </div>
               <br>
           </div>
