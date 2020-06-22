@@ -4,6 +4,7 @@
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: 100%;
+  width: 100%;
   background-color: rgba(255,255,255,0.85);
   background-blend-mode: lighten;
 }
@@ -18,12 +19,12 @@ html, body {
 #overlay {
   position: fixed; 
   display: none; 
-  width: 99%;
-  height: 99%;
+  width: 100%;
+  height: 100%;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  /* right: 0;
+  bottom: 0; */
   background-color: rgba(10,10,10,0.9); 
   z-index: 2;
   display: flex;
