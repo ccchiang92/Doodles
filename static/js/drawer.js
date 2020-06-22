@@ -2,15 +2,6 @@
 // Init
 // Setup categories
 var categories = ['Animals','Fruits','Vehicles'];
-// var drawings = {
-//     Animal: ['ant','bat','bear','bee','bird','butterfly','camel','cat','cow','crab','crocodile','dog','dolphin','dragon','duck',
-// 'elephant','fish','flamingo','frog','giraffe','hedgehog','horse','kangaroo','lion','lobster','monkey','mosquito','mouse','octopus','owl',
-// 'panda','parrot','penguin','pig','rabbit','raccoon','rhinoceros','scorpion','sea turtle','shark','sheep','snail','snake','spider','squirrel','swan','tiger','whale','zebra'],
-//     Fruit: ['apple','banana','blackberry','blueberry','grapes','pear','pineapple','strawberry','watermelon'],
-//     Vehicle: ['aircraft carrier','airplane','ambulance','bicycle','bulldozer','bus','canoe','car','cruise ship','firetruck','flying saucer','helicopter',
-// 'pickup truck','police car','sailboat','school bus','skateboard','speedboat','submarine','tractor','train','truck','van']
-// };
-
 var easy30 = ['bat','bird','camel','cat','cow','crab','dog','dragon','elephant','fish','frog','giraffe','horse','mouse','shark','snake','apple','banana','grapes','pear','pineapple','strawberry','airplane','bicycle','bus','car','submarine','truck','sailboat','train','van'];
 var drawings ={
     Animals: easy30.slice(0,16),
@@ -210,19 +201,9 @@ detailBTN.on('click',function(){
         overDiv.select('#close').on('click',function(){
             overDiv.remove();
         })
-        overDiv.append('button')
-            .attr('class',"btn btn-light btn-lg float-right")
-            .attr('id','pooling')
-            .text('See Next Model Step')
-            .style('position', 'absolute')
-            .style('top','40px')
-            .style('right','40px')
-        overDiv.select('#pooling').on('click',function(){
-            overDiv.remove();
-        })
         conDiv = overDiv.append('div').attr('class','fluid-container align-middle justify-content-center');
         conDiv.append('div').attr('class','ovRow1 row justify-content-center').append('h2')
-                .text("Below are the outputs of our first CNN model, a 2D convolution layer.")
+                .text("Below are the outputs of our first CNN model layer, a 2D convolution layer.")
                 .attr('class','text-white align-middle')
                 .append('h2').text('The input image is convoluted with 16 different 3x3 matrices to generate 16 different images.').attr('class','text-white align-middle');
         var row1 = conDiv.append('div').attr('class','row justify-content-center');
@@ -235,6 +216,23 @@ detailBTN.on('click',function(){
             }
         }
         cropAndEval(canvas,2);
+        overDiv.append('button')
+            .attr('class',"btn btn-light btn-lg float-right")
+            .attr('id','pooling')
+            .text('See Next Model Step')
+            .style('position', 'absolute')
+            .style('top','40px')
+            .style('right','40px')
+        overDiv.select('#pooling').on('click',function(){
+            cropAndEval(canvas,3);
+            overDiv.select('#pooling').remove();
+            conDiv.select('h2').text("Below are the outputs of our second CNN model layer, a 2D max pooling layer.")
+            .append('h3').text('The outputs of the first layer are downsize by a factor of 2x2.').attr('class','text-white align-middle')
+            .append('h3').text('These are just some visualizations of the first steps in our model').attr('class','text-white align-middle')
+            .append('h3').text('Convolution and pooling are repeated a few time then pass into 3 dense layers').attr('class','text-white align-middle')
+            // .append('h3').text('We used adam for optimizer, accuracy for metrics, softmax activation for output layer and relu for eveything else.').attr('class','text-white align-middle')
+            .append('h3').text('For more detail please explore our github repo and the resource links in the about page').attr('class','text-white align-middle');
+        })
     }else{
         alert('Assess an image first!')
     }
@@ -247,7 +245,6 @@ function cropAndEval(canvas,mode){
         xCoords = drawingCoords.map(coord=>coord.x);
         yCoords = drawingCoords.map(coord=>coord.y);
         drawingCorners={min:[Math.min(...xCoords),Math.min(...yCoords)],max:[Math.max(...xCoords),Math.max(...yCoords)]};
-        console.log(drawingCorners);
         // Use the corners to grab pixel data array of the drawing
         var pRatio = window.devicePixelRatio;
         var pixels = canvas.getContext('2D').getImageData(Math.floor(drawingCorners.min[0]) * pRatio, Math.floor(drawingCorners.min[1]) * pRatio,
@@ -261,9 +258,8 @@ function cropAndEval(canvas,mode){
 }
 
 
-// mode 0 is per stroke eval, 1 is assess, 2 is convolution
+// mode 0 is per stroke eval, 1 is assess, 2 is convolution, 3 pooling
 async function evalImg(img,canvas,mode){
-        console.log(img);
         // convert imgData to tf object with 1 color
         var imgTF = tf.browser.fromPixels(img,1);   
         // resize img to 28x28 matching our data
@@ -273,7 +269,6 @@ async function evalImg(img,canvas,mode){
         var scaled = tf.scalar(1.0).sub(img28.div(tf.scalar(255.0)));
         // call model for prediction
         var prediction = model.predict(scaled.expandDims(0)).dataSync();
-        // var secStep = await model.layers[1].apply(tf.tensor(firstStep).reshape([168,168,16]).expandDims(0)).dataSync();
         
         // find highest predictions
         var probabilities = grabMaxOutput(prediction);
@@ -312,13 +307,12 @@ async function evalImg(img,canvas,mode){
         }else if(mode === 2){
             var img168 =tf.image.resizeNearestNeighbor(imgTF,[168,168]);
             var firstStep = await model.layers[0].apply(tf.scalar(1.0).sub(img168.div(tf.scalar(255.0))).expandDims(0)).dataSync();
+            
             filterStep=0;
             filterOutput={};
             for (var i=0;i<16;i++){
                 filterOutput[i.toString()]=[];
             }
-            x=[];
-            y=[];
             for (var i=0;i<firstStep.length;i++){
                 var iString = filterStep.toString();
                 var currentFLength=filterOutput[iString].length;
@@ -348,6 +342,44 @@ async function evalImg(img,canvas,mode){
             for (var i=0;i<16;i++){
                 // console.log(filterOutput[i.toString()]);
                 drawProcessed(tf.scalar(1).sub(tf.tensor(filterOutput[i.toString()])),'overCanvas'+i)       
+            // console.log(filterOutput);
+        } 
+        }else if(mode === 3){
+            var img168 =tf.image.resizeNearestNeighbor(imgTF,[168,168]);
+            var firstStep = await model.layers[0].apply(tf.scalar(1.0).sub(img168.div(tf.scalar(255.0))).expandDims(0)).dataSync();
+            var secStep = await model.layers[1].apply(tf.tensor(firstStep).reshape([168,168,16]).expandDims(0)).dataSync();
+            filterStep=0;
+            filterOutput={};
+            for (var i=0;i<16;i++){
+                filterOutput[i.toString()]=[];
+            }
+            for (var i=0;i<firstStep.length;i++){
+                var iString = filterStep.toString();
+                var currentFLength=filterOutput[iString].length;
+                if (currentFLength===0){
+                    filterOutput[iString].push([1-secStep[i]]);
+                }else{
+                    var lastArr= filterOutput[iString].pop();
+                    if(lastArr.length<83){
+                        lastArr.push(1-secStep[i]);
+                        filterOutput[iString].push(lastArr);
+                    }else{
+                        lastArr.push(1-secStep[i]);
+                        filterOutput[iString].push(lastArr);
+                        if (currentFLength<84){
+                            filterOutput[iString].push([]);
+                        }
+                    }
+                } 
+                if(filterStep===15){
+                    filterStep=0;
+                }else{
+                    filterStep++;
+                }
+            }
+            for (var i=0;i<16;i++){
+                drawProcessed(tf.tensor(filterOutput[i.toString()]),'overCanvas'+i);
+                // console.log(filterOutput[i.toString()]);
             } 
             console.log(filterOutput);
         }
@@ -357,7 +389,6 @@ async function evalImg(img,canvas,mode){
 // draw resized image to output canvas
 async function drawProcessed(tensor,canvas){
     var convertedImg = await tf.browser.toPixels(tensor,document.getElementById(canvas));
-    // var convertedImg = await tf.browser.toPixels(tensor2,document.getElementById('outCanvas2'));
     return convertedImg;
 }
 
@@ -434,7 +465,7 @@ function landing(){
         var text1 = row2.append('h2').style("opacity", 0);
         var text2 = row2.append('h2').style("opacity", 0)
         catGif.transition().delay(1000).duration(2000).style("opacity", 1);
-        text1.transition().delay(1500).duration(1000).text("Welcome to <project name>, Our Final Project for Berkeley's Data Analytics Bootcamp")
+        text1.transition().delay(1500).duration(1000).text("Welcome to ABC Smart Doodler by team Axel, Brian and Chris, our Final Project for Berkeley's Data Analytics Bootcamp")
         .attr('class','text-black text-align-middle align-middle').style("opacity", 1);
         text1.transition().delay(5000).duration(500).style("opacity", 0);
         text2.transition().delay(2500).duration(1000).style("opacity", 1)
@@ -443,6 +474,7 @@ function landing(){
         overDiv.select('#next').on('click',function(){
             switch (step){
                 case 0 :
+                overDiv.transition().duration(500).style("background-color", "gold");
                 text2.transition().delay(500).duration(500).style("opacity", 0);
                 text1.transition().delay(2000).duration(1000).text("On this website, you'll be able to draw on a canvas from number of categories").style("opacity", 1);
                 text1.transition().delay(7000).duration(500).style("opacity", 0);
@@ -450,6 +482,7 @@ function landing(){
                 step ++ ;
                 break
                 case 1 :
+                    overDiv.transition().duration(500).style("background-color", "lightblue");
                     var cnnFig =row1.append('img').attr('src', './static/images/CNN.jpeg').style("opacity", 0).style('height','40%').style('width','40%').style('vertical-align','bottom');
                     cnnFig.transition().delay(2000).duration(2000).style("opacity", 1);
                     text2.transition().delay(1000).duration(500).style("opacity", 0);
@@ -458,12 +491,14 @@ function landing(){
                     step ++ ;
                     break
                 case 2:
+                    var text3 = row2.append('h2').style("opacity", 0).attr('class','text-black text-align-middle align-middle')
+                    overDiv.transition().duration(500).style("background-color", "rgba(255,255,255,0.95)");
                     text1.transition().delay(500).duration(500).style("opacity", 0);
                     text2.transition().delay(500).duration(500).style("opacity", 0);
                     text1.transition().delay(1500).duration(1000).text('There are tons to explore such as fun mini game elements, neural network visualization and summary').style("opacity", 1);
                     text2.transition().delay(3000).duration(1000).text('Links are on the top and bottom to github for source code, data sources, resources, our profile pages and more').style("opacity", 1);
-                    text1.transition().delay(9000).duration(500).text('Click the buttons to start drawing');
-                    text2.transition().delay(9000).duration(500).style("opacity", 0);
+                    text3.transition().delay(9000).duration(500).text('Click the buttons to start drawing').style("opacity", 1).attr('class','text-black text-align-middle align-middle');;
+                    overDiv.select('#next').text('Start Drawing')
                     step ++ ;
                     break
                 case 3:
@@ -472,7 +507,7 @@ function landing(){
                 }
         })
         overDiv.select('#close').on('click',function(){
-            overDiv.remove();
+            overDiv.remove();   
         })
     }
 
