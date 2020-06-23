@@ -100,6 +100,9 @@ This concept can be expanded in many ways.
 - By combining multiple models/types we can add to the complexity of the model significantly. To increase "learning" we could add a RNN, add a binary classification problem, add in sentiment analysis if we add in text, etc.
 - Not limit the user imput to a drawing, let them submit a picture, test, or even video.
 - Video is only a dimension of time different from an image.
+- The quickdraw data's raw data are stored as vectors of people's drawing strokes, potentially we can use the stroke data to generate a machine learning model to create new doodles from a given category. Using this model we would then create a versus game between the player drawing and computer guesses V.S. the computer drawing and the player guesses.
+
+Lastly, responsiveness of the website is poor, right now it's only design for screens of 1080p or higher on a computer. Hopefully we can improve moble support in the future.
 
 
 
