@@ -1,4 +1,5 @@
 ABC's Smart Doodler
+[Try the demo](https://ccchiang92.github.io/Doodles/)
 ======
 Project Objective
 ------
