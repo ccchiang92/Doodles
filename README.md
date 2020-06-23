@@ -1,4 +1,4 @@
-Project Name -HERE-
+ABC's Smart Doodler
 ======
 Project Objective
 ------
@@ -36,17 +36,53 @@ Google generiously has the entire data set available for public use. This consis
 - Setup a Sequential Convolution Neural Network to run our data into.
 --* Our model is a much smaller version of the famous VGG-16 model based on the research paper [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/abs/1409.1556) by *Karen Simonyan, Andrew Zisserman*
 
+###### Results
+
+
 
 #### HTML / Javascript
+1. **Layout** 
 - Use Bootstrap for general HTML layout and formatting.
 - HTML canvas will be the element that the user can interact and "draw" on.
-- Used a js library called fabric to handle the "drawing" actions.
+- Used a js library called fabric to handle the event listener actions.
+2. **Image ETL**
+###### Extract
+- Pulled out the users drawing with ```tf.browser.fromPixels(img,1)```. The one indicates only 1 color channel.
+###### Transform
+- Resized the image to match Googles data that the model was trained on.
 
-#### Visualization
+```tf.image.resizeBilinear(imgTF,[28,28])```
+
+- Quantize the user image
+
+```tf.scalar(1.0).sub(img28.div(tf.scalar(255.0))```
+
+
+###### Load
+- Start loading the saved model right away with an async, await function.
+
+```async function loadModel() {```
+    ```model = await tf.loadLayersModel('./model/30Ver2/model.json');```
+- Load in our list of categories the model has been trained on.
+- Last but not least, run the users image into the model with the "Assess Drawing" button
+
+
+### IT WORKS!!! ###
+*(most of the time)*
+
 
 Results
 ------
+#### Visualization
 
+
+The Future
+------
+This concept can be expanded in many ways.
+- We only used a small subset of Googles images.  The model could be set up with batch loading, dataGenerators or even turn the data into Tensorflow data objects.
+- By combining multiple models/types we can add to the complexity of the model significantly. To increase "learning" we could add a RNN, add a binary classification problem, add in sentiment analysis if we add in text, etc.
+- Not limit the user imput to a drawing, let them submit a picture, test, or even video.
+- Video is only a dimension of time different from an image.
 
 
 
