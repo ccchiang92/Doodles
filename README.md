@@ -1,10 +1,11 @@
 ABC's Smart Doodler
-[Try the demo](https://ccchiang92.github.io/Doodles/)
+
 ======
 Project Objective
 ------
-Inspired by Googles doodling game [Quick, Draw!](https://quickdraw.withgoogle.com/#) our group wanted to explore the world of convolutional neural networks(CNN) and how they work. To do this our goal was to see if we could produce a quick loading CNN on a web interface with no back end support. Users would choose a category and submit their own images to the CNN for decifering, with minimal load times and provide the user with visual feedback.  We want to provide the user with a data representation of the models predictions.  Also if possible provide a visual representation on "how" the model came to that particular conclusion.
-  
+Inspired by Googles doodling game [Quick, Draw!](https://quickdraw.withgoogle.com/#) our group wanted to explore the world of convolutional neural networks(CNN) and how they work. To do this our goal was to see if we could produce a quick loading CNN on a web interface with no back end support. Users would choose a category and submit their own images to the CNN for decifering, with minimal load times and provide the user with visual feedback.  We want to provide the user with a data representation of the models predictions.  Also if possible provide a visual representation on "how" the model came to that particular conclusion. \ 
+[Try the demo](https://ccchiang92.github.io/Doodles/) \
+
 Data Set
 ------
 Google generiously has the entire data set available for public use. This consists of **Millions** of user submitted doodles.  The files are stored on their cloud service as 28x28 numpy arrays by category.  Google keeps track of the actual strokes of users so you can actual recreate how the user drew the image stroke by stroke.  There is also some metadata information about where the person is from etc.  For the scope of our project we will be focusing on just the image itself(28x28 numpy array).
