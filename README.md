@@ -39,7 +39,7 @@ Google generiously has the entire data set available for public use. This consis
 ###### Results
 Reached a peak of 89% accuracy with some hypertuning.
 - The plugin HPARAM was used for Hypertuning.
---* Used a GridSearch method on a smaller subset of data for testing.
+- Used a GridSearch method on a smaller subset of data for testing.
 
 After Hypertuning the model some of the big take aways are:
 1. The relu activation function alone had almost a +30% increase in accuracy compared to some others.
@@ -100,7 +100,6 @@ This concept can be expanded in many ways.
 - By combining multiple models/types we can add to the complexity of the model significantly. To increase "learning" we could add a RNN, add a binary classification problem, add in sentiment analysis if we add in text, etc.
 - Not limit the user imput to a drawing, let them submit a picture, test, or even video.
 - Video is only a dimension of time different from an image.
-- The quickdraw data's raw data are stored as vectors of people's drawing strokes, potentially we can use the stroke data to generate a machine learning model to create new doodles from a given category. Using this model we would then create a versus game between the player drawing and computer guesses V.S. the computer drawing and the player guesses.
 
 
 
