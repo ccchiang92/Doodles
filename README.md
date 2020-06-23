@@ -38,11 +38,17 @@ Google generiously has the entire data set available for public use. This consis
 
 ###### Results
 Reached a peak of 89% accuracy with some hypertuning.
+- The plugin HPARAM was used for Hypertuning.
+--* Used a GridSearch method on a smaller subset of data for testing.
+
 After Hypertuning the model some of the big take aways are:
-- The relu activation function alone had almost a +30% increase in accuracy compared to some others.
-- Adam was the goto loss function with default .001, might of been able to increase it a touch.
-- The more layers the better. This affects load times on the model, so this needs to be balanced to your objective.
-- 
+1. The relu activation function alone had almost a +30% increase in accuracy compared to some others.
+2. Adam was the goto loss function with default .001, might of been able to increase it a touch.
+3. More layers = better. This affects load times on the model, so this needs to be balanced to your objective.
+
+We used TensorBoard to watch and review the models performance.
+
+FS for TensorBoard was used to view results.
 
 
 #### HTML / Javascript
@@ -50,6 +56,7 @@ After Hypertuning the model some of the big take aways are:
 - Use Bootstrap for general HTML layout and formatting.
 - HTML canvas will be the element that the user can interact and "draw" on.
 - Used a js library called fabric to handle the event listener actions.
+
 2. **Image ETL**
 ###### Extract
 - Pulled out the users drawing with ```tf.browser.fromPixels(img,1)```. The one indicates only 1 color channel.
