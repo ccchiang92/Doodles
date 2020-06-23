@@ -74,7 +74,8 @@ Google generiously has the entire data set available for public use. This consis
 Results
 ------
 #### Visualization
-
+- Create the basic d3 graph that visualize real-time predictions with confidence levels.
+- Use clusterize.js library to handle with long lists of drawing categories.
 
 The Future
 ------
