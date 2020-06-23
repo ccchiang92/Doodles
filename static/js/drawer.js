@@ -61,6 +61,7 @@ function makeResponsive(){
     var drawCanvasDiv = d3.select('.canvasDiv')
         .append('div')
         .attr('id','canvasDiv')
+        .attr('class','container align-middle justify-content-center');
     drawCanvasDiv
         .append('canvas')
         .attr('height', Height)
@@ -70,6 +71,7 @@ function makeResponsive(){
     var canvas =  new fabric.Canvas('c', {
         isDrawingMode: false
       });
+    drawCanvasDiv.select('canvas').attr('class','align-middle')
     // Set background to white and canvas parameters
     canvas.backgroundColor = '#ffffff';
     canvas.freeDrawingBrush.width = 16;
