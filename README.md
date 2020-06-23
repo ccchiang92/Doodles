@@ -22,7 +22,7 @@ Google generiously has the entire data set available for public use. This consis
 - One hot encoding for our label array.`
 ```y = tf.keras.utils.to_categorical(y, num_classes=len(label_names))```
 - Sequential Models take in 4D arrays so we reshape.
---* change the data type to save some memory and quantize the data to values between 0 and 1.
+--* Quantize the data to values between 0 and 1.
 ```X = X.reshape(-1,28,28, 1).astype('float32') / 255```
 - Use sklearn's train_test_split to seperate our data into train and test splits.
 
@@ -37,7 +37,12 @@ Google generiously has the entire data set available for public use. This consis
 --* Our model is a much smaller version of the famous VGG-16 model based on the research paper [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/abs/1409.1556) by *Karen Simonyan, Andrew Zisserman*
 
 ###### Results
-
+Reached a peak of 89% accuracy with some hypertuning.
+After Hypertuning the model some of the big take aways are:
+- The relu activation function alone had almost a +30% increase in accuracy compared to some others.
+- Adam was the goto loss function with default .001, might of been able to increase it a touch.
+- The more layers the better. This affects load times on the model, so this needs to be balanced to your objective.
+- 
 
 
 #### HTML / Javascript
@@ -53,7 +58,7 @@ Google generiously has the entire data set available for public use. This consis
 
 ```tf.image.resizeBilinear(imgTF,[28,28])```
 
-- Quantize the user image
+- Quantize the user image.
 
 ```tf.scalar(1.0).sub(img28.div(tf.scalar(255.0))```
 
@@ -64,7 +69,11 @@ Google generiously has the entire data set available for public use. This consis
 ```async function loadModel() {```
     ```model = await tf.loadLayersModel('./model/30Ver2/model.json');```
 - Load in our list of categories the model has been trained on.
-- Last but not least, run the users image into the model with the "Assess Drawing" button
+
+ ```await jQuery.getJSON```
+ 
+ 
+- Last but not least, run the users image into the model with the "Assess Drawing" button.
 
 
 ### IT WORKS!!! ###
@@ -74,8 +83,7 @@ Google generiously has the entire data set available for public use. This consis
 Results
 ------
 #### Visualization
-- Create the basic d3 graph that visualize real-time predictions with confidence levels.
-- Use clusterize.js library to handle with long lists of drawing categories.
+
 
 The Future
 ------
