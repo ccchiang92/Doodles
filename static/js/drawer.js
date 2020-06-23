@@ -155,9 +155,9 @@ startBTN.on('click',function(){
                 countingDown= false;
                 d3.select('#hourglass').remove();
                 timerText.text('').transition().duration(1000);
+                clearInterval(countDown);
                 cropAndEval(canvas,1);
                 assessed=true;
-                clearInterval(countDown);
             }
         }, 1000);}
 });
