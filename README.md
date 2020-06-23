@@ -91,7 +91,7 @@ Results
 ------
 #### Visualization
 - We used d3 bar graph to visualize real-time predictions and show how confidence level changes while user is giving more details to the drawing.
-- We also use clusterize.js custom library to handle with long lists of drawing categories and visualize them in a small scrolling window.
+- We also used clusterize.js custom library to handle with long lists of drawing categories and visualize them in a small scrolling window.
 
 The Future
 ------
