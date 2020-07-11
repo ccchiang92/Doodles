@@ -1,9 +1,9 @@
 ABC's Smart Doodler
 
-======
+------
 Project Objective
 ------
-Inspired by Googles doodling game [Quick, Draw!](https://quickdraw.withgoogle.com/#) our group wanted to explore the world of convolutional neural networks(CNN) and how they work. To do this our goal was to see if we could produce a quick loading CNN on a web interface with no back end support. Users would choose a category and submit their own images to the CNN for decifering, with minimal load times and provide the user with visual feedback.  We want to provide the user with a data representation of the models predictions.  Also if possible provide a visual representation on "how" the model came to that particular conclusion. \ 
+Inspired by Googles doodling game [Quick, Draw!](https://quickdraw.withgoogle.com/#) our group wanted to explore the world of convolutional neural networks(CNN) and how they work. To do this our goal was to see if we could produce a quick loading CNN on a web interface with no back end support. Users would choose a category and submit their own images to the CNN for decifering, with minimal load times and provide the user with visual feedback.  We want to provide the user with a data representation of the models predictions.  Also if possible provide a visual representation on "how" the model came to that particular conclusion. 
 [Try the demo](https://ccchiang92.github.io/Doodles/) 
 
 Data Set
